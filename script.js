@@ -13,9 +13,26 @@ let courses = [
     { id: 4, name: 'Logistics', code: 'L404', category: 'cars', instructor: 'Prof. Jessica Lee', startDate: '2025-01-20', endDate: '2025-05-20', status: 'active', description: 'Building engine' },
     { id: 5, name: 'Computer Science', code: 'CM505', category: 'programming', instructor: 'Dr. Thomas Brown', startDate: '2024-11-15', endDate: '2025-03-15', status: 'completed', description: 'Learn HTML, CSS, and JavaScript.' }
 ];
-
-
-
+let grades = [
+    { id: 1, student: 'Kristiyan Todorov', course: 'Software Engineering', assignment: 'Project 1', grade: 92, date: '2025-02-15', comments: 'Excellent work!' },
+    { id: 2, student: 'Krasen Nedelchev', course: 'Mathematics and Computer Science pedagogy', assignment: 'Calculus II', grade: 88, date: '2025-02-20', comments: 'Good insights.' },
+    { id: 3, student: 'Kristiyan Todorov', course: 'Software Engineering', assignment: 'Project 2', grade: 85, date: '2025-03-10', comments: 'Needs improvement in responsiveness.' },
+    { id: 4, student: 'Alex Dimitrov', course: 'English Philology', assignment: 'Project 1', grade: 90, date: '2025-02-15', comments: 'Great job!' },
+    { id: 5, student: 'Plamena Dimitrova', course: 'Computer Science', assignment: 'iOS App', grade: 95, date: '2025-02-25', comments: 'Impressive application!' }
+];
+let attendance = [
+    { id: 1, student: 'Kristiyan Todorov', course: 'Software Engineering', status: 'present', checkInTime: '09:05', date: '2025-04-10' },
+    { id: 2, student: 'Krasen Nedelchev', course: 'Mathematics and Computer Science pedagogy', status: 'present', checkInTime: '09:00', date: '2025-04-10' },
+    { id: 3, student: 'Ivo Indjev', course: 'Logistics', status: 'absent', checkInTime: '', date: '2025-04-10' },
+    { id: 4, student: 'Plamena Dimitrova', course: 'Computer Science', status: 'present', checkInTime: '09:10', date: '2025-04-10' },
+    { id: 5, student: 'Alex Dimitrov', course: 'English Philology', status: 'late', checkInTime: '09:20', date: '2025-04-10' }
+];
+let activities = [
+    { action: 'New student enrolled', details: 'Kristiyan Todorov joined Software Engineering', time: '2025-04-08 10:15' },
+    { action: 'Grade updated', details: 'Project 1 grades for Software Engineering posted', time: '2025-04-07 14:30' },
+    { action: 'Course started', details: 'Logistics course officially began', time: '2025-04-01 09:00' },
+    { action: 'Attendance recorded', details: 'Attendance taken for all active courses', time: '2025-04-10 09:30' }
+];
 
 // Theme switcher
 document.getElementById('themeToggle').addEventListener('click', () => {
