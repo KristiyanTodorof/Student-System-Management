@@ -44,4 +44,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const isDarkTheme = localStorage.getItem('darkTheme') === 'true';
     if (isDarkTheme) {
         document.body.classList.add('dark-theme');
-    }});
+}});
+
+// Set today's date for attendance
+document.getElementById('attendanceDate').valueAsDate = new Date();
+
+// Add event listeners to page-specific buttons
+document.getElementById('addStudentBtn').addEventListener('click', () => openStudentModal());
+document.getElementById('addCourseBtn').addEventListener('click', () => openCourseModal());
+document.getElementById('addGradeBtn').addEventListener('click', () => openGradeModal());
+
+//Search functionality
+document.getElementById('searchBtn').addEventListener('clisk', performSearch);
+document.getElementById('searchInput').addEventListener('keypress',(e) => {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});
+
+//Attendance navigation
+document.getElementById('prevDateBtn').addEventListener('click', navigateAttendanceDate);
