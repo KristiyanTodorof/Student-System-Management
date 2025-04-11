@@ -17,7 +17,7 @@ let grades = [
     { id: 1, student: 'Kristiyan Todorov', course: 'Software Engineering', assignment: 'Project 1', grade: 92, date: '2025-02-15', comments: 'Excellent work!' },
     { id: 2, student: 'Krasen Nedelchev', course: 'Mathematics and Computer Science pedagogy', assignment: 'Calculus II', grade: 88, date: '2025-02-20', comments: 'Good insights.' },
     { id: 3, student: 'Kristiyan Todorov', course: 'Software Engineering', assignment: 'Project 2', grade: 85, date: '2025-03-10', comments: 'Needs improvement in responsiveness.' },
-    { id: 4, student: 'Alex Dimitrov', course: 'English Philology', assignment: 'Project 1', grade: 90, date: '2025-02-15', comments: 'Great job!' },
+    { id: 4, student: 'Alex Dimitrov', course: 'English Philology', assignment: 'Project 1', grade: 70, date: '2025-02-15', comments: 'Great job!' },
     { id: 5, student: 'Plamena Dimitrova', course: 'Computer Science', assignment: 'iOS App', grade: 95, date: '2025-02-25', comments: 'Impressive application!' }
 ];
 let attendance = [
@@ -37,30 +37,88 @@ let activities = [
 // Theme switcher
 document.getElementById('themeToggle').addEventListener('click', () => {
     document.body.classList.toggle('dark-theme');
+    // Store theme preference
     const isDarkTheme = document.body.classList.contains('dark-theme');
     localStorage.setItem('darkTheme', isDarkTheme);
 });
+
+// Check theme preference on load
 document.addEventListener('DOMContentLoaded', () => {
     const isDarkTheme = localStorage.getItem('darkTheme') === 'true';
     if (isDarkTheme) {
         document.body.classList.add('dark-theme');
-}});
-
-// Set today's date for attendance
-document.getElementById('attendanceDate').valueAsDate = new Date();
-
-// Add event listeners to page-specific buttons
-document.getElementById('addStudentBtn').addEventListener('click', () => openStudentModal());
-document.getElementById('addCourseBtn').addEventListener('click', () => openCourseModal());
-document.getElementById('addGradeBtn').addEventListener('click', () => openGradeModal());
-
-//Search functionality
-document.getElementById('searchBtn').addEventListener('clisk', performSearch);
-document.getElementById('searchInput').addEventListener('keypress',(e) => {
-    if (e.key === 'Enter') {
-        performSearch();
     }
+    
+    // Initialize dashboard and load first page data
+    updateDashboardStats();
+    loadStudentsTable();
+    loadCoursesGrid();
+    loadGradesTable();
+    initAttendance();
+    updateActivityList();
+    initCharts();
+    
+    // Set today's date for attendance
+    document.getElementById('attendanceDate').valueAsDate = new Date();
+    
+    // Add event listeners to page-specific buttons
+    document.getElementById('addStudentBtn').addEventListener('click', () => openStudentModal());
+    document.getElementById('addCourseBtn').addEventListener('click', () => openCourseModal());
+    document.getElementById('addGradeBtn').addEventListener('click', () => openGradeModal());
+    
+    // Initialize search functionality
+    document.getElementById('searchBtn').addEventListener('click', performSearch);
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch();
+    });
+    
+    // Attendance navigation
+    document.getElementById('prevDateBtn').addEventListener('click', navigateAttendanceDate);
+    document.getElementById('nextDateBtn').addEventListener('click', navigateAttendanceDate);
+    document.getElementById('attendanceDate').addEventListener('change', loadAttendanceTable);
+    document.getElementById('attendanceFilterCourse').addEventListener('change', loadAttendanceTable);
+    
+    // Attendance actions
+    document.getElementById('markAllPresentBtn').addEventListener('click', markAllPresent);
+    document.getElementById('saveAttendanceBtn').addEventListener('click', saveAttendance);
+    
+    // Notification close button
+    document.querySelector('.close-notification').addEventListener('click', () => {
+        document.getElementById('notification').style.display = 'none';
+    });
 });
 
-//Attendance navigation
-document.getElementById('prevDateBtn').addEventListener('click', navigateAttendanceDate);
+// Navigation
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        // Update active nav item
+        document.querySelectorAll('.nav-item').forEach(navItem => {
+            navItem.classList.remove('active');
+        });
+        item.classList.add('active');
+        
+        // Show selected page
+        const pageId = item.getAttribute('data-page');
+        document.querySelectorAll('.page-container').forEach(page => {
+            page.classList.add('hidden');
+        });
+        document.getElementById(pageId).classList.remove('hidden');
+    });
+});
+
+// Dashboard stats
+function updateDashboardStats() {
+    document.getElementById('totalStudents').textContent = students.length;
+    document.getElementById('totalCourses').textContent = courses.filter(course => course.status === 'active').length;
+
+    const allGrades = grades.map(grade => grade.grade);
+    const avgGrade = allGrades.length ? 
+        (allGrades.reduce((sum, grade) => sum + grade, 0) / allGrades.length).toFixed(1) : 
+        '0.0';
+    document.getElementById('avgGrade').textContent = avgGrade;
+
+    const totalAttendance = attendance.length;
+    const presentCount = attendance.filter(record => record.status === 'present' || record.status === 'late').length;
+    const attendanceRate = totalAttendance ? Math.round((presentCount / totalAttendance) * 100) : 0;
+    document.getElementById('attendanceRate').textContent = `${attendanceRate}%`;
+}
