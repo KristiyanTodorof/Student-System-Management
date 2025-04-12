@@ -7,13 +7,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-container">
-    <aside class="sidebar">
-        <div class="logo"> 
-            <h2>Virtual School</h2>
-        </div>
-             <nav class="nav-menu">
-                 <ul>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>StudentMS</h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
                     <li class="nav-item active" data-page="dashboard">
                         <span class="icon">📊</span>
                         <span>Dashboard</span>
@@ -34,146 +35,131 @@
                         <span class="icon">📅</span>
                         <span>Attendance</span>
                     </li>
-                 </ul>
-             </nav>
-             <div class="sidebar-footer">
-                <p>Kristiyan Todorov - Course Project</p>
-                <p>© 2025</p>
-             </div>
-    </aside>
-    <main class="main-content">
-          <header class="header">
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Search...">
-                <button id="searchBtn">🔍</button>
-            </div>
-            <div class="user-actions">
-                <button id="themeToggle">🌓</button>
-                <div class="user-profile">
-                    <span>Admin</span>
-                    <img src="admin.png" alt="User Avatar">
-                </div>
-            </div>
-          </header>
-
-          <div class="page-container" id="dashboard">
-            <h1>Dashboard</h1>
-            <div class="dashboard-stats">
-                <div class="stat-card">
-                    <h3>Total Students</h3>
-                    <p id="totalStudents">0</p>
-                    <div class="stat-icon">👨‍🎓</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Active Courses</h3>
-                    <p id="totalCourses">0</p>
-                    <div class="stat-icon">📚</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Average Grade</h3>
-                    <p id="avgGrade">0</p>
-                    <div class="stat-icon">📝</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Attendance Rate</h3>
-                    <p id="attendanceRate">0%</p>
-                    <div class="stat-icon">📅</div>
-                </div>
-                <div class="chart-container">
-                    <div class="chart-card">
-                     <h3>Grade Distribution</h3>
-                     <canvas id="gradesChart">
-                     </canvas>
-                    </div>
-                    <div class="chart-card">
-                     <h3>Attendance Trends</h3>
-                     <canvas id="attendanceChart"></canvas>
-                   </div>
-            </div>
-            <div class="recent-activity">
-                <h3>Recent Activity</h3>
-                <ul id="activityList">
                 </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p>Course Project</p>
+                <p>© 2025</p>
             </div>
-          </div>
+        </aside>
 
-          <!-- Students Management -->
-          <div class="page-container hidden" id="students">
-            <h1>Student Management</h1>
-            <div class="action-bar">
-                <button id="addStudentBtn" class="btn btn-primary">Add New Student</button>
-                <div class="filter-options">
-                    <select id="studentFilterCourse">
-                        <option value="">All Courses</option>
-                    </select>
-                    <select id="studentFilterStatus">
-                        <option value="">All Statuses</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="header">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search...">
+                    <button id="searchBtn">🔍</button>
+                </div>
+                <div class="user-actions">
+                    <button id="themeToggle">🌓</button>
+                    <div class="user-profile">
+                        <span>Admin</span>
+                        <img src="admin.png" alt="User Avatar">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <div class="page-container" id="dashboard">
+                <h1>Dashboard</h1>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Total Students</h3>
+                        <p id="totalStudents">0</p>
+                        <div class="stat-icon">👨‍🎓</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Courses</h3>
+                        <p id="totalCourses">0</p>
+                        <div class="stat-icon">📚</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Average Grade</h3>
+                        <p id="avgGrade">0</p>
+                        <div class="stat-icon">📝</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Attendance Rate</h3>
+                        <p id="attendanceRate">0%</p>
+                        <div class="stat-icon">📅</div>
+                    </div>
+                </div>
+                <div class="recent-activity">
+                    <h3>Recent Activity</h3>
+                    <ul id="activityList">
+                        <!-- Will be populated with JavaScript -->
+                    </ul>
                 </div>
             </div>
-            <div class="table-container">
-                <table id="studentsTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Course</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-            <div id="studentPagination" class="pagination">
-            </div>
-          </div>
 
-          <!-- Course Management -->
-          <div class="page-container hidden" id="courses">
-            <h1>Course Management</h1>
-            <div class="action-bar">
-                <button id="addCourseBtn" class="btn btn-primary">Add New Course</button>
-                <div class="filter-options">
-                    <select id="courseFilterCategory">
-                        <option value="">All Categories</option>
-                        <option value="programming">Programming</option>
-                        <option value="design">Design</option>
-                        <option value="business">Business</option>
-                    </select>
-                    <select id="courseFilterStatus">
-                        <option value="">All Statuses</option>
-                        <option value="active">Active</option>
-                        <option value="upcoming">Upcoming</option>
-                        <option value="completed">Completed</option>
-                    </select>
+            <!-- Students Page -->
+            <div class="page-container hidden" id="students">
+                <h1>Student Management</h1>
+                <div class="action-bar">
+                    <button id="addStudentBtn" class="btn btn-primary">Add New Student</button>
+                    <div class="filter-options">
+                        <select id="studentFilterCourse">
+                            <option value="">All Courses</option>
+                            <!-- Will be populated with JavaScript -->
+                        </select>
+                        <select id="studentFilterStatus">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated with JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="studentPagination" class="pagination">
+                    <!-- Will be populated with JavaScript -->
                 </div>
             </div>
-            <div class="table-container">
-                <table id="coursesTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Course</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-            <div id="coursePagination" class="pagination">
-            </div>
-          </div>
 
-            <!-- Grades Management -->
+            <!-- Courses Page -->
+            <div class="page-container hidden" id="courses">
+                <h1>Course Management</h1>
+                <div class="action-bar">
+                    <button id="addCourseBtn" class="btn btn-primary">Add New Course</button>
+                    <div class="filter-options">
+                        <select id="courseFilterCategory">
+                            <option value="">All Categories</option>
+                            <option value="programming">Programming</option>
+                            <option value="design">Design</option>
+                            <option value="business">Business</option>
+                        </select>
+                        <select id="courseFilterStatus">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="course-grid" id="courseGrid">
+                    <!-- Will be populated with JavaScript -->
+                </div>
+                <div id="coursePagination" class="pagination">
+                    <!-- Will be populated with JavaScript -->
+                </div>
+            </div>
+
+            <!-- Grades Page -->
             <div class="page-container hidden" id="grades">
                 <h1>Grade Management</h1>
                 <div class="action-bar">
@@ -181,9 +167,11 @@
                     <div class="filter-options">
                         <select id="gradeFilterStudent">
                             <option value="">All Students</option>
+                            <!-- Will be populated with JavaScript -->
                         </select>
                         <select id="gradeFilterCourse">
                             <option value="">All Courses</option>
+                            <!-- Will be populated with JavaScript -->
                         </select>
                     </div>
                 </div>
@@ -200,14 +188,16 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- Will be populated with JavaScript -->
                         </tbody>
                     </table>
                 </div>
                 <div id="gradePagination" class="pagination">
+                    <!-- Will be populated with JavaScript -->
                 </div>
             </div>
 
-            <!-- Attendance Management -->
+            <!-- Attendance Page -->
             <div class="page-container hidden" id="attendance">
                 <h1>Attendance Tracking</h1>
                 <div class="action-bar">
@@ -218,6 +208,7 @@
                     </div>
                     <select id="attendanceFilterCourse">
                         <option value="">All Courses</option>
+                        <!-- Will be populated with JavaScript -->
                     </select>
                 </div>
                 <div class="table-container">
@@ -232,6 +223,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- Will be populated with JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -242,155 +234,157 @@
             </div>
         </main>
     </div>
-    </main>
-</div>
-<!-- Student Form -->
-<div class="modal" id="studentModal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2 id="studentModalTitle">Add New Student</h2>
-        <form id="studentForm">
-            <input type="hidden" id="studentId">
-            <div class="form-group">
-                <label for="studentName">Full Name:</label>
-                <input type="text" id="studentName" required>
-            </div>
-            <div class="form-group">
-                <label for="studentEmail">Email:</label>
-                <input type="email" id="studentEmail" required>
-            </div>
-            <div class="form-group">
-                <label for="studentPhone">Phone:</label>
-                <input type="tel" id="studentPhone">
-            </div>
-            <div class="form-group">
-                <label for="studentCourse">Course:</label>
-                <select id="studentCourse" required>
-                    <!-- Will be populated with JavaScript -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="studentStatus">Status:</label>
-                <select id="studentStatus" required>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="studentNotes">Notes:</label>
-                <textarea id="studentNotes"></textarea>
-            </div>
-            <div class="form-buttons">
-                <button type="button" class="btn btn-secondary" id="cancelStudentBtn">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<!-- Course Form -->
-<div class="modal" id="courseModal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2 id="courseModalTitle">Add New Course</h2>
-        <form id="courseForm">
-            <input type="hidden" id="courseId">
-            <div class="form-group">
-                <label for="courseName">Course Name:</label>
-                <input type="text" id="courseName" required>
-            </div>
-            <div class="form-group">
-                <label for="courseCode">Course Code:</label>
-                <input type="text" id="courseCode" required>
-            </div>
-            <div class="form-group">
-                <label for="courseCategory">Category:</label>
-                <select id="courseCategory" required>
-                    <option value="programming">Programming</option>
-                    <option value="design">Design</option>
-                    <option value="business">Business</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="courseInstructor">Instructor:</label>
-                <input type="text" id="courseInstructor" required>
-            </div>
-            <div class="form-group">
-                <label for="courseStartDate">Start Date:</label>
-                <input type="date" id="courseStartDate" required>
-            </div>
-            <div class="form-group">
-                <label for="courseEndDate">End Date:</label>
-                <input type="date" id="courseEndDate" required>
-            </div>
-            <div class="form-group">
-                <label for="courseStatus">Status:</label>
-                <select id="courseStatus" required>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="courseDescription">Description:</label>
-                <textarea id="courseDescription"></textarea>
-            </div>
-            <div class="form-buttons">
-                <button type="button" class="btn btn-secondary" id="cancelCourseBtn">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </form>
+    <!-- Modals -->
+    <!-- Student Modal -->
+    <div class="modal" id="studentModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="studentModalTitle">Add New Student</h2>
+            <form id="studentForm">
+                <input type="hidden" id="studentId">
+                <div class="form-group">
+                    <label for="studentName">Full Name:</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentEmail">Email:</label>
+                    <input type="email" id="studentEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="studentPhone">Phone:</label>
+                    <input type="tel" id="studentPhone">
+                </div>
+                <div class="form-group">
+                    <label for="studentCourse">Course:</label>
+                    <select id="studentCourse" required>
+                        <!-- Will be populated with JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="studentStatus">Status:</label>
+                    <select id="studentStatus" required>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="studentNotes">Notes:</label>
+                    <textarea id="studentNotes"></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelStudentBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Grade Form -->
-<div class="modal" id="gradeModal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2 id="gradeModalTitle">Add New Grade</h2>
-        <form id="gradeForm">
-            <input type="hidden" id="gradeId">
-            <div class="form-group">
-                <label for="gradeStudent">Student:</label>
-                <select id="gradeStudent" required>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="gradeCourse">Course:</label>
-                <select id="gradeCourse" required>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="gradeAssignment">Assignment:</label>
-                <input type="text" id="gradeAssignment" required>
-            </div>
-            <div class="form-group">
-                <label for="gradeValue">Grade (0-100):</label>
-                <input type="number" id="gradeValue" min="0" max="100" required>
-            </div>
-            <div class="form-group">
-                <label for="gradeDate">Date:</label>
-                <input type="date" id="gradeDate" required>
-            </div>
-            <div class="form-group">
-                <label for="gradeComments">Comments:</label>
-                <textarea id="gradeComments"></textarea>
-            </div>
-            <div class="form-buttons">
-                <button type="button" class="btn btn-secondary" id="cancelGradeBtn">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </form>
+    <!-- Course Modal -->
+    <div class="modal" id="courseModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="courseModalTitle">Add New Course</h2>
+            <form id="courseForm">
+                <input type="hidden" id="courseId">
+                <div class="form-group">
+                    <label for="courseName">Course Name:</label>
+                    <input type="text" id="courseName" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseCode">Course Code:</label>
+                    <input type="text" id="courseCode" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseCategory">Category:</label>
+                    <select id="courseCategory" required>
+                        <option value="programming">Programming</option>
+                        <option value="design">Design</option>
+                        <option value="business">Business</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="courseInstructor">Instructor:</label>
+                    <input type="text" id="courseInstructor" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseStartDate">Start Date:</label>
+                    <input type="date" id="courseStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseEndDate">End Date:</label>
+                    <input type="date" id="courseEndDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseStatus">Status:</label>
+                    <select id="courseStatus" required>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="courseDescription">Description:</label>
+                    <textarea id="courseDescription"></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelCourseBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Notification Component -->
-<div class="notification" id="notification">
-    <span id="notificationMessage"></span>
-    <span class="close-notification">&times;</span>
-</div>
-<script src="script.js"></script>
-</body>
-</html>
+    <!-- Grade Modal -->
+    <div class="modal" id="gradeModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="gradeModalTitle">Add New Grade</h2>
+            <form id="gradeForm">
+                <input type="hidden" id="gradeId">
+                <div class="form-group">
+                    <label for="gradeStudent">Student:</label>
+                    <select id="gradeStudent" required>
+                        <!-- Will be populated with JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeCourse">Course:</label>
+                    <select id="gradeCourse" required>
+                        <!-- Will be populated with JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeAssignment">Assignment:</label>
+                    <input type="text" id="gradeAssignment" required>
+                </div>
+                <div class="form-group">
+                    <label for="gradeValue">Grade (0-100):</label>
+                    <input type="number" id="gradeValue" min="0" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="gradeDate">Date:</label>
+                    <input type="date" id="gradeDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="gradeComments">Comments:</label>
+                    <textarea id="gradeComments"></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelGradeBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Component -->
+    <div class="notification" id="notification">
+        <span id="notificationMessage"></span>
+        <span class="close-notification">&times;</span>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>
