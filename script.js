@@ -1,556 +1,77 @@
-let students = [
-    { id: 1, name: 'Kristiyan Todorov', email: 'todorovk585@gmail.com', course: 'Software Engineering', status: 'active', phone: '0888916060', notes: 'Excellent student' },
-    { id: 2, name: 'Krasen Nedelchev', email: 'nedelchev@gmail.com', course: 'Mathematics and Computer Science pedagogy', status: 'active', phone: '0878738732', notes: 'Good student' },
-    { id: 3, name: 'Alex Dimitrov', email: 'dimitrov@gmail.com', course: 'English Philology', status: 'active', phone: '0878856480', notes: 'Good listening skills' },
-    { id: 4, name: 'Ivo Indjev', email: 'indjev@abv.bg', course: 'Logistics', status: 'inactive', phone: '0882256011', notes: 'Needs improvement' },
-    { id: 5, name: 'Plamena Dimitrova', email: 'dimitrova@abv.bg', course: 'Computer Science', status: 'active', phone: '0883492267', notes: 'Great progress' }
-];
-let courses = [
-    { id: 1, name: 'Software Engineering', code: 'SE101', category: 'programming', instructor: 'Dr. Alan Smith', startDate: '2025-01-15', endDate: '2025-05-15', status: 'active', description: 'Learn .NET, JavaScipt, and Android.' },
-    { id: 2, name: 'Mathematics and Computer Science pedagogy', code: 'MC202', category: 'mathematics', instructor: 'Prof. Emily Johnson', startDate: '2025-02-10', endDate: '2025-06-10', status: 'active', description: 'Master calculus.' },
-    { id: 3, name: 'English Philology', code: 'EP303', category: 'english', instructor: 'Dr. Robert Wilson', startDate: '2025-03-01', endDate: '2025-07-01', status: 'upcoming', description: 'Book analysis'},
-    { id: 4, name: 'Logistics', code: 'L404', category: 'cars', instructor: 'Prof. Jessica Lee', startDate: '2025-01-20', endDate: '2025-05-20', status: 'active', description: 'Building engine' },
-    { id: 5, name: 'Computer Science', code: 'CM505', category: 'programming', instructor: 'Dr. Thomas Brown', startDate: '2024-11-15', endDate: '2025-03-15', status: 'completed', description: 'Learn HTML, CSS, and JavaScript.' }
-];
-let grades = [
-    { id: 1, student: 'Kristiyan Todorov', course: 'Software Engineering', assignment: 'Project 1', grade: 92, date: '2025-02-15', comments: 'Excellent work!' },
-    { id: 2, student: 'Krasen Nedelchev', course: 'Mathematics and Computer Science pedagogy', assignment: 'Calculus II', grade: 88, date: '2025-02-20', comments: 'Good insights.' },
-    { id: 3, student: 'Kristiyan Todorov', course: 'Software Engineering', assignment: 'Project 2', grade: 85, date: '2025-03-10', comments: 'Needs improvement in responsiveness.' },
-    { id: 4, student: 'Alex Dimitrov', course: 'English Philology', assignment: 'Project 1', grade: 70, date: '2025-02-15', comments: 'Great job!' },
-    { id: 5, student: 'Plamena Dimitrova', course: 'Computer Science', assignment: 'iOS App', grade: 95, date: '2025-02-25', comments: 'Impressive application!' }
-];
-let attendance = [
-    { id: 1, student: 'Kristiyan Todorov', course: 'Software Engineering', status: 'present', checkInTime: '09:05', date: '2025-04-10' },
-    { id: 2, student: 'Krasen Nedelchev', course: 'Mathematics and Computer Science pedagogy', status: 'present', checkInTime: '09:00', date: '2025-04-10' },
-    { id: 3, student: 'Ivo Indjev', course: 'Logistics', status: 'absent', checkInTime: '', date: '2025-04-10' },
-    { id: 4, student: 'Plamena Dimitrova', course: 'Computer Science', status: 'present', checkInTime: '09:10', date: '2025-04-10' },
-    { id: 5, student: 'Alex Dimitrov', course: 'English Philology', status: 'late', checkInTime: '09:20', date: '2025-04-10' }
-];
-let activities = [
-    { action: 'New student enrolled', details: 'Kristiyan Todorov joined Software Engineering', time: '2025-04-08 10:15' },
-    { action: 'Grade updated', details: 'Project 1 grades for Software Engineering posted', time: '2025-04-07 14:30' },
-    { action: 'Course started', details: 'Logistics course officially began', time: '2025-04-01 09:00' },
-    { action: 'Attendance recorded', details: 'Attendance taken for all active courses', time: '2025-04-10 09:30' }
-];
+// script.js - Frontend JavaScript for Student Management System
 
-document.getElementById('themeToggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark-theme');
-    const isDarkTheme = document.body.classList.contains('dark-theme');
-    localStorage.setItem('darkTheme', isDarkTheme);
+// Global variables
+let currentPage = 'dashboard';
+let isDarkTheme = false;
+const API_URL = 'http://localhost:5000/api';
+let studentsData = [];
+let coursesData = [];
+let gradesData = [];
+let attendanceData = [];
+let activitiesData = [];
+
+// DOM ready event listener
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the app
+    initializeApp();
+    
+    // Set up navigation
+    setupNavigation();
+    
+    // Setup theme toggle
+    setupThemeToggle();
+    
+    // Setup search functionality
+    setupSearch();
+    
+    // Setup modal events
+    setupModals();
+    
+    // Setup form handlers
+    setupFormHandlers();
+    
+    // Load initial data
+    loadDashboardData();
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const isDarkTheme = localStorage.getItem('darkTheme') === 'true';
-    if (isDarkTheme) {
+// Initialize the application
+function initializeApp() {
+    // Check for saved theme
+    if (localStorage.getItem('darkTheme') === 'true') {
         document.body.classList.add('dark-theme');
+        isDarkTheme = true;
     }
     
-    updateDashboardStats();
-    loadStudentsTable();
-    loadCoursesGrid();
-    loadGradesTable();
-    initAttendance();
-    updateActivityList();
-    initCharts();
+    // Initialize button events
+    document.getElementById('initFirebaseBtn').addEventListener('click', initializeData);
+    document.getElementById('addStudentBtn').addEventListener('click', () => openModal('studentModal'));
+    document.getElementById('addCourseBtn').addEventListener('click', () => openModal('courseModal'));
+    document.getElementById('addGradeBtn').addEventListener('click', () => openModal('gradeModal'));
     
-    document.getElementById('attendanceDate').valueAsDate = new Date();
-    
-    document.getElementById('addStudentBtn').addEventListener('click', () => openStudentModal());
-    document.getElementById('addCourseBtn').addEventListener('click', () => openCourseModal());
-    document.getElementById('addGradeBtn').addEventListener('click', () => openGradeModal());
-    
-    document.getElementById('searchBtn').addEventListener('click', performSearch);
-    document.getElementById('searchInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') performSearch();
-    });
-    
-    document.getElementById('prevDateBtn').addEventListener('click', navigateAttendanceDate);
-    document.getElementById('nextDateBtn').addEventListener('click', navigateAttendanceDate);
-    document.getElementById('attendanceDate').addEventListener('change', loadAttendanceTable);
-    document.getElementById('attendanceFilterCourse').addEventListener('change', loadAttendanceTable);
-    
+    // Attendance controls
     document.getElementById('markAllPresentBtn').addEventListener('click', markAllPresent);
     document.getElementById('saveAttendanceBtn').addEventListener('click', saveAttendance);
+    document.getElementById('prevDateBtn').addEventListener('click', () => changeAttendanceDate(-1));
+    document.getElementById('nextDateBtn').addEventListener('click', () => changeAttendanceDate(1));
+    document.getElementById('attendanceDate').valueAsDate = new Date();
+    document.getElementById('attendanceDate').addEventListener('change', loadAttendanceData);
     
-    document.querySelector('.close-notification').addEventListener('click', () => {
-        document.getElementById('notification').style.display = 'none';
-    });
-});
-
-
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(navItem => {
-            navItem.classList.remove('active');
-        });
-        item.classList.add('active');
-        
-        const pageId = item.getAttribute('data-page');
-        document.querySelectorAll('.page-container').forEach(page => {
-            page.classList.add('hidden');
-        });
-        document.getElementById(pageId).classList.remove('hidden');
-    });
-});
-
-function updateDashboardStats() {
-    document.getElementById('totalStudents').textContent = students.length;
-    document.getElementById('totalCourses').textContent = courses.filter(course => course.status === 'active').length;
-    
-    const allGrades = grades.map(grade => grade.grade);
-    const avgGrade = allGrades.length ? 
-        (allGrades.reduce((sum, grade) => sum + grade, 0) / allGrades.length).toFixed(1) : 
-        '0.0';
-    document.getElementById('avgGrade').textContent = avgGrade;
-    
-    const totalAttendance = attendance.length;
-    const presentCount = attendance.filter(record => record.status === 'present' || record.status === 'late').length;
-    const attendanceRate = totalAttendance ? Math.round((presentCount / totalAttendance) * 100) : 0;
-    document.getElementById('attendanceRate').textContent = `${attendanceRate}%`;
-}
-
-function formatDate(dateString) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-}
-
-function showNotification(message) {
-    const notification = document.getElementById('notification');
-    document.getElementById('notificationMessage').textContent = message;
-    notification.style.display = 'flex';
-    
-    setTimeout(() => {
-        notification.style.display = 'none';
-    }, 3000);
-}
-
-function updateActivityList() {
-    const activityList = document.getElementById('activityList');
-    activityList.innerHTML = '';
-    
-    activities.forEach(activity => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <div>
-                <strong>${activity.action}</strong>
-                <p>${activity.details}</p>
-            </div>
-            <span class="activity-time">${activity.time}</span>
-        `;
-        activityList.appendChild(li);
-    });
-}
-
-function addActivity(action, details) {
-    const now = new Date();
-    const time = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    
-    const newActivity = {
-        action,
-        details,
-        time
-    };
-    
-    activities.unshift(newActivity);
-    
-    if (activities.length > 10) {
-        activities.pop();
-    }
-    
-    updateActivityList();
-}
-
-function initCharts() {
-    const gradeCtx = document.getElementById('gradesChart').getContext('2d');
-    const gradeRanges = {
-        'A (90-100)': 0,
-        'B (80-89)': 0,
-        'C (70-79)': 0,
-        'D (60-69)': 0,
-        'F (0-59)': 0
-    };
-    
-    grades.forEach(grade => {
-        if (grade.grade >= 90) gradeRanges['A (90-100)']++;
-        else if (grade.grade >= 80) gradeRanges['B (80-89)']++;
-        else if (grade.grade >= 70) gradeRanges['C (70-79)']++;
-        else if (grade.grade >= 60) gradeRanges['D (60-69)']++;
-        else gradeRanges['F (0-59)']++;
-    });
-    
-    new Chart(gradeCtx, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(gradeRanges),
-            datasets: [{
-                label: 'Number of Students',
-                data: Object.values(gradeRanges),
-                backgroundColor: [
-                    '#4caf50',
-                    '#8bc34a',
-                    '#ffc107',
-                    '#ff9800',
-                    '#f44336'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        precision: 0
-                    }
-                }
-            }
-        }
-    });
-    
-    const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
-    new Chart(attendanceCtx, {
-        type: 'line',
-        data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
-            datasets: [{
-                label: 'Attendance Rate (%)',
-                data: [95, 90, 88, 92, 94],
-                fill: false,
-                borderColor: '#4a6cfa',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
+    // Initialize date fields with current date
+    const today = new Date();
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        if (!input.id.includes('Date')) {
+            input.valueAsDate = today;
         }
     });
 }
 
-function performSearch() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-    
-    if (!searchTerm) {
-        showNotification('Please enter a search term');
-        return;
-    }
-    
-    const foundStudents = students.filter(student => 
-        student.name.toLowerCase().includes(searchTerm) || 
-        student.email.toLowerCase().includes(searchTerm)
-    );
-    
-    const foundCourses = courses.filter(course => 
-        course.name.toLowerCase().includes(searchTerm) || 
-        course.code.toLowerCase().includes(searchTerm) ||
-        course.instructor.toLowerCase().includes(searchTerm)
-    );
-    
-    if (foundStudents.length > 0) {
-        document.querySelectorAll('.nav-item').forEach(navItem => {
-            navItem.classList.remove('active');
-        });
-        document.querySelector('[data-page="students"]').classList.add('active');
-        
-        document.querySelectorAll('.page-container').forEach(page => {
-            page.classList.add('hidden');
-        });
-        document.getElementById('students').classList.remove('hidden');
-        
-        const tableBody = document.querySelector('#studentsTable tbody');
-        tableBody.innerHTML = '';
-        
-        foundStudents.forEach(student => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${student.id}</td>
-                <td>${student.name}</td>
-                <td>${student.email}</td>
-                <td>${student.course}</td>
-                <td><span class="status-badge status-${student.status}">${student.status}</span></td>
-                <td class="table-actions">
-                    <button class="edit-btn" data-id="${student.id}">✏️</button>
-                    <button class="delete-btn" data-id="${student.id}">🗑️</button>
-                </td>
-            `;
-            tableBody.appendChild(tr);
-        });
-        
-        document.querySelectorAll('#studentsTable .edit-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const studentId = parseInt(btn.getAttribute('data-id'));
-                openStudentModal(studentId);
-            });
-        });
-        
-        document.querySelectorAll('#studentsTable .delete-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const studentId = parseInt(btn.getAttribute('data-id'));
-                deleteStudent(studentId);
-            });
-        });
-        
-        showNotification(`Found ${foundStudents.length} student(s) matching "${searchTerm}"`);
-    } else if (foundCourses.length > 0) {
-        document.querySelectorAll('.nav-item').forEach(navItem => {
-            navItem.classList.remove('active');
-        });
-        document.querySelector('[data-page="courses"]').classList.add('active');
-        
-        document.querySelectorAll('.page-container').forEach(page => {
-            page.classList.add('hidden');
-        });
-        document.getElementById('courses').classList.remove('hidden');
-        
-        const courseGrid = document.getElementById('courseGrid');
-        courseGrid.innerHTML = '';
-        
-        foundCourses.forEach(course => {
-            const courseCard = document.createElement('div');
-            courseCard.className = 'course-card';
-            courseCard.innerHTML = `
-                <div class="course-header">
-                    <h3 class="course-title">${course.name}</h3>
-                    <p class="course-code">${course.code}</p>
-                </div>
-                <div class="course-body">
-                    <div class="course-instructor">
-                        <span>👨‍🏫</span>
-                        <span>${course.instructor}</span>
-                    </div>
-                    <div class="course-dates">
-                        <span>📅</span>
-                        <span>${formatDate(course.startDate)} - ${formatDate(course.endDate)}</span>
-                    </div>
-                    <div class="course-status">
-                        <span>⚪</span>
-                        <span class="status-badge status-${course.status}">${course.status}</span>
-                    </div>
-                    <p class="course-description">${course.description}</p>
-                </div>
-                <div class="course-footer">
-                    <button class="btn btn-primary edit-course-btn" data-id="${course.id}">Edit</button>
-                    <button class="btn btn-danger delete-course-btn" data-id="${course.id}">Delete</button>
-                </div>
-            `;
-            courseGrid.appendChild(courseCard);
-        });
-        
-        document.querySelectorAll('.edit-course-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const courseId = parseInt(btn.getAttribute('data-id'));
-                openCourseModal(courseId);
-            });
-        });
-        
-        document.querySelectorAll('.delete-course-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const courseId = parseInt(btn.getAttribute('data-id'));
-                deleteCourse(courseId);
-            });
-        });
-        
-        showNotification(`Found ${foundCourses.length} course(s) matching "${searchTerm}"`);
-    } else {
-        showNotification(`No results found for "${searchTerm}"`);
-    }
-}
-
-function loadStudentsTable() {
-    const tableBody = document.querySelector('#studentsTable tbody');
-    tableBody.innerHTML = '';
-
-    const courseFilter = document.getElementById('studentFilterCourse').value;
-    const statusFilter = document.getElementById('studentFilterStatus').value;
-    
-    let filteredStudents = students;
-    
-    if (courseFilter) {
-        filteredStudents = filteredStudents.filter(student => student.course === courseFilter);
-    }
-    
-    if (statusFilter) {
-        filteredStudents = filteredStudents.filter(student => student.status === statusFilter);
-    }
-    
-    filteredStudents.forEach(student => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${student.id}</td>
-            <td>${student.name}</td>
-            <td>${student.email}</td>
-            <td>${student.course}</td>
-            <td><span class="status-badge status-${student.status}">${student.status}</span></td>
-            <td class="table-actions">
-                <button class="edit-btn" data-id="${student.id}">✏️</button>
-                <button class="delete-btn" data-id="${student.id}">🗑️</button>
-            </td>
-        `;
-        tableBody.appendChild(tr);
-    });
-    
-    document.querySelectorAll('#studentsTable .edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const studentId = parseInt(btn.getAttribute('data-id'));
-            openStudentModal(studentId);
-        });
-    });
-    
-    document.querySelectorAll('#studentsTable .delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const studentId = parseInt(btn.getAttribute('data-id'));
-            deleteStudent(studentId);
-        });
-    });
-    
-    const courseSelect = document.getElementById('studentFilterCourse');
-    if (courseSelect.options.length <= 1) {
-        courses.forEach(course => {
-            const option = document.createElement('option');
-            option.value = course.name;
-            option.textContent = course.name;
-            courseSelect.appendChild(option);
-        });
-    }
-    
-    document.getElementById('studentFilterCourse').addEventListener('change', loadStudentsTable);
-    document.getElementById('studentFilterStatus').addEventListener('change', loadStudentsTable);
-}
-
-function openStudentModal(studentId = null) {
-    const modal = document.getElementById('studentModal');
-    const modalTitle = document.getElementById('studentModalTitle');
-    const form = document.getElementById('studentForm');
-    const studentIdInput = document.getElementById('studentId');
-    const nameInput = document.getElementById('studentName');
-    const emailInput = document.getElementById('studentEmail');
-    const phoneInput = document.getElementById('studentPhone');
-    const courseSelect = document.getElementById('studentCourse');
-    const statusSelect = document.getElementById('studentStatus');
-    const notesInput = document.getElementById('studentNotes');
-    
-    courseSelect.innerHTML = '';
-    courses.forEach(course => {
-        const option = document.createElement('option');
-        option.value = course.name;
-        option.textContent = course.name;
-        courseSelect.appendChild(option);
-    });
-    
-    if (studentId) {
-        modalTitle.textContent = 'Edit Student';
-        const student = students.find(s => s.id === studentId);
-        
-        studentIdInput.value = student.id;
-        nameInput.value = student.name;
-        emailInput.value = student.email;
-        phoneInput.value = student.phone || '';
-        courseSelect.value = student.course;
-        statusSelect.value = student.status;
-        notesInput.value = student.notes || '';
-    } else {
-        modalTitle.textContent = 'Add New Student';
-        form.reset();
-        studentIdInput.value = '';
-    }
-    
-    modal.style.display = 'flex';
-    
-    document.querySelector('#studentModal .close-modal').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    document.getElementById('cancelStudentBtn').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    form.onsubmit = function(e) {
-        e.preventDefault();
-        
-        const studentData = {
-            name: nameInput.value,
-            email: emailInput.value,
-            phone: phoneInput.value,
-            course: courseSelect.value,
-            status: statusSelect.value,
-            notes: notesInput.value
-        };
-        
-        if (studentId) {
-            updateStudent(studentId, studentData);
-        } else {
-            addStudent(studentData);
-        }
-        
-        modal.style.display = 'none';
-    };
-}
-
-function addStudent(studentData) {
-    const newId = students.length ? Math.max(...students.map(s => s.id)) + 1 : 1;
-    
-    const newStudent = {
-        id: newId,
-        ...studentData
-    };
-    
-    students.push(newStudent);
-    
-    loadStudentsTable();
-    updateDashboardStats();
-    
-    addActivity(`New student enrolled`, `${studentData.name} joined ${studentData.course}`);
-    
-    showNotification('Student added successfully!');
-}
-
-function updateStudent(id, studentData) {
-    const index = students.findIndex(s => s.id === id);
-    
-    students[index] = {
-        ...students[index],
-        ...studentData
-    };
-    
-    loadStudentsTable();
-    
-    addActivity('Student updated', `${studentData.name}'s information was updated`);
-    
-    showNotification('Student updated successfully!');
-}
-
-function deleteStudent(id) {
-    if (confirm('Are you sure you want to delete this student?')) {
-        const student = students.find(s => s.id === id);
-        const studentName = student ? student.name : 'Unknown student';
-        
-        students = students.filter(student => student.id !== id);
-        
-        loadStudentsTable();
-        updateDashboardStats();
-        
-        addActivity('Student removed', `${studentName} was removed from the system`);
-        
-        showNotification('Student deleted successfully!');
-    }
-}
-
-function loadCoursesGrid() {
-    const courseGrid = document.getElementById('courseGrid');
-    courseGrid.innerHTML = '';
-    
+// Filter courses based on category and status
+function filterCourses() {
     const categoryFilter = document.getElementById('courseFilterCategory').value;
     const statusFilter = document.getElementById('courseFilterStatus').value;
     
-    let filteredCourses = courses;
+    let filteredCourses = [...coursesData];
     
     if (categoryFilter) {
         filteredCourses = filteredCourses.filter(course => course.category === categoryFilter);
@@ -560,234 +81,173 @@ function loadCoursesGrid() {
         filteredCourses = filteredCourses.filter(course => course.status === statusFilter);
     }
     
-    filteredCourses.forEach(course => {
-        const courseCard = document.createElement('div');
-        courseCard.className = 'course-card';
-        courseCard.innerHTML = `
-            <div class="course-header">
-                <h3 class="course-title">${course.name}</h3>
-                <p class="course-code">${course.code}</p>
-            </div>
-            <div class="course-body">
-                <div class="course-instructor">
-                    <span>👨‍🏫</span>
-                    <span>${course.instructor}</span>
-                </div>
-                <div class="course-dates">
-                    <span>📅</span>
-                    <span>${formatDate(course.startDate)} - ${formatDate(course.endDate)}</span>
-                </div>
-                <div class="course-status">
-                    <span>⚪</span>
-                    <span class="status-badge status-${course.status}">${course.status}</span>
-                </div>
-                <p class="course-description">${course.description}</p>
-            </div>
-            <div class="course-footer">
-                <button class="btn btn-primary edit-course-btn" data-id="${course.id}">Edit</button>
-                <button class="btn btn-danger delete-course-btn" data-id="${course.id}">Delete</button>
-            </div>
-        `;
-        courseGrid.appendChild(courseCard);
-    });
-    
-    document.querySelectorAll('.edit-course-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const courseId = parseInt(btn.getAttribute('data-id'));
-            openCourseModal(courseId);
-        });
-    });
-    
-    document.querySelectorAll('.delete-course-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const courseId = parseInt(btn.getAttribute('data-id'));
-            deleteCourse(courseId);
-        });
-    });
-    
-    document.getElementById('courseFilterCategory').addEventListener('change', loadCoursesGrid);
-    document.getElementById('courseFilterStatus').addEventListener('change', loadCoursesGrid);
+    renderCoursesGrid(filteredCourses);
 }
 
-function openCourseModal(courseId = null) {
-    const modal = document.getElementById('courseModal');
-    const modalTitle = document.getElementById('courseModalTitle');
-    const form = document.getElementById('courseForm');
-    const courseIdInput = document.getElementById('courseId');
-    const nameInput = document.getElementById('courseName');
-    const codeInput = document.getElementById('courseCode');
-    const categorySelect = document.getElementById('courseCategory');
-    const instructorInput = document.getElementById('courseInstructor');
-    const startDateInput = document.getElementById('courseStartDate');
-    const endDateInput = document.getElementById('courseEndDate');
-    const statusSelect = document.getElementById('courseStatus');
-    const descriptionInput = document.getElementById('courseDescription');
-    
-    if (courseId) {
-        modalTitle.textContent = 'Edit Course';
-        const course = courses.find(c => c.id === courseId);
-        
-        courseIdInput.value = course.id;
-        nameInput.value = course.name;
-        codeInput.value = course.code;
-        categorySelect.value = course.category;
-        instructorInput.value = course.instructor;
-        startDateInput.value = course.startDate;
-        endDateInput.value = course.endDate;
-        statusSelect.value = course.status;
-        descriptionInput.value = course.description || '';
-    } else {
-        modalTitle.textContent = 'Add New Course';
-        form.reset();
-        courseIdInput.value = '';
-    }
-    
-    modal.style.display = 'flex';
-    
-    document.querySelector('#courseModal .close-modal').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    document.getElementById('cancelCourseBtn').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    form.onsubmit = function(e) {
-        e.preventDefault();
-        
-        const courseData = {
-            name: nameInput.value,
-            code: codeInput.value,
-            category: categorySelect.value,
-            instructor: instructorInput.value,
-            startDate: startDateInput.value,
-            endDate: endDateInput.value,
-            status: statusSelect.value,
-            description: descriptionInput.value
-        };
-        
-        if (courseId) {
-            updateCourse(courseId, courseData);
-        } else {
-            addCourse(courseData);
-        }
-        
-        modal.style.display = 'none';
-    };
-}
-
-function addCourse(courseData) {
-    const newId = courses.length ? Math.max(...courses.map(c => c.id)) + 1 : 1;
-    
-    const newCourse = {
-        id: newId,
-        ...courseData
-    };
-    
-    courses.push(newCourse);
-    
-    loadCoursesGrid();
-    updateDashboardStats();
-    
-    updateCourseDropdowns();
-    
-    addActivity('New course added', `${courseData.name} (${courseData.code}) was added`);
-    
-    showNotification('Course added successfully!');
-}
-
-function updateCourse(id, courseData) {
-    const index = courses.findIndex(c => c.id === id);
-    
-    courses[index] = {
-        ...courses[index],
-        ...courseData
-    };
-    
-    loadCoursesGrid();
-    updateDashboardStats();
-    
-    updateCourseDropdowns();
-    
-    addActivity('Course updated', `${courseData.name} (${courseData.code}) was updated`);
-    
-    showNotification('Course updated successfully!');
-}
-
-function deleteCourse(id) {
-    if (confirm('Are you sure you want to delete this course?')) {
-        const course = courses.find(c => c.id === id);
-        const courseName = course ? course.name : 'Unknown course';
-        
-        courses = courses.filter(course => course.id !== id);
-        
-        loadCoursesGrid();
-        updateDashboardStats();
-        
-        updateCourseDropdowns();
-        
-        addActivity('Course removed', `${courseName} was removed from the system`);
-        
-        showNotification('Course deleted successfully!');
+// Confirm and delete a course
+function confirmDeleteCourse(course) {
+    if (confirm(`Are you sure you want to delete ${course.name} (${course.code})?`)) {
+        deleteCourse(course._id);
     }
 }
 
-function updateCourseDropdowns() {
-    const studentFilterCourse = document.getElementById('studentFilterCourse');
-    studentFilterCourse.innerHTML = '<option value="">All Courses</option>';
-    
-    const gradeFilterCourse = document.getElementById('gradeFilterCourse');
-    gradeFilterCourse.innerHTML = '<option value="">All Courses</option>';
-    
-    const attendanceFilterCourse = document.getElementById('attendanceFilterCourse');
-    attendanceFilterCourse.innerHTML = '<option value="">All Courses</option>';
-    
-    const studentCourse = document.getElementById('studentCourse');
-    if (studentCourse) studentCourse.innerHTML = '';
-    
-    const gradeCourse = document.getElementById('gradeCourse');
-    if (gradeCourse) gradeCourse.innerHTML = '';
-    
-    courses.forEach(course => {
-        const option1 = document.createElement('option');
-        option1.value = course.name;
-        option1.textContent = course.name;
-        studentFilterCourse.appendChild(option1);
+// Delete a course from the API
+async function deleteCourse(courseId) {
+    try {
+        const response = await fetch(`${API_URL}/courses/${courseId}`, {
+            method: 'DELETE'
+        });
         
-        const option2 = document.createElement('option');
-        option2.value = course.name;
-        option2.textContent = course.name;
-        gradeFilterCourse.appendChild(option2);
-        
-        const option3 = document.createElement('option');
-        option3.value = course.name;
-        option3.textContent = course.name;
-        attendanceFilterCourse.appendChild(option3);
-        
-        if (studentCourse) {
-            const option4 = document.createElement('option');
-            option4.value = course.name;
-            option4.textContent = course.name;
-            studentCourse.appendChild(option4);
+        if (!response.ok) {
+            throw new Error('Failed to delete course');
         }
-
-        if (gradeCourse) {
-            const option5 = document.createElement('option');
-            option5.value = course.name;
-            option5.textContent = course.name;
-            gradeCourse.appendChild(option5);
+        
+        showNotification('Course deleted successfully!', 'success');
+        loadCoursesData();
+        // Also reload dashboard to update stats
+        if (currentPage === 'dashboard') {
+            loadDashboardData();
         }
-    });
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
 }
 
-function loadGradesTable() {
+// Populate the course form with data for editing
+function populateCourseForm(course) {
+    document.getElementById('courseId').value = course._id;
+    document.getElementById('courseName').value = course.name;
+    document.getElementById('courseCode').value = course.code;
+    document.getElementById('courseCategory').value = course.category;
+    document.getElementById('courseInstructor').value = course.instructor;
+    
+    // Format date inputs properly (YYYY-MM-DD)
+    const startDate = new Date(course.startDate);
+    document.getElementById('courseStartDate').value = startDate.toISOString().split('T')[0];
+    
+    const endDate = new Date(course.endDate);
+    document.getElementById('courseEndDate').value = endDate.toISOString().split('T')[0];
+    
+    document.getElementById('courseStatus').value = course.status;
+    document.getElementById('courseDescription').value = course.description || '';
+}
+
+// Load and display Grades data
+async function loadGradesData() {
+    try {
+        await fetchGrades();
+        
+        // Populate students and courses dropdowns for filters
+        populateStudentsDropdown('gradeFilterStudent');
+        populateCoursesDropdown('gradeFilterCourse');
+        
+        // Render grades table
+        renderGradesTable(gradesData);
+    } catch (error) {
+        showNotification('Failed to load grades data: ' + error.message, 'error');
+    }
+}
+
+// Fetch grades from the API
+async function fetchGrades() {
+    try {
+        const response = await fetch(`${API_URL}/grades`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch grades');
+        }
+        gradesData = await response.json();
+        return gradesData;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Render grades table
+function renderGradesTable(grades) {
     const tableBody = document.querySelector('#gradesTable tbody');
     tableBody.innerHTML = '';
     
+    if (grades.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 6;
+        td.textContent = 'No grades found';
+        td.style.textAlign = 'center';
+        tr.appendChild(td);
+        tableBody.appendChild(tr);
+        return;
+    }
+    
+    grades.forEach(grade => {
+        const tr = document.createElement('tr');
+        
+        // Student column
+        const tdStudent = document.createElement('td');
+        tdStudent.textContent = grade.student;
+        tr.appendChild(tdStudent);
+        
+        // Course column
+        const tdCourse = document.createElement('td');
+        tdCourse.textContent = grade.course;
+        tr.appendChild(tdCourse);
+        
+        // Assignment column
+        const tdAssignment = document.createElement('td');
+        tdAssignment.textContent = grade.assignment;
+        tr.appendChild(tdAssignment);
+        
+        // Grade column
+        const tdGrade = document.createElement('td');
+        tdGrade.textContent = grade.grade;
+        // Apply color based on grade
+        if (grade.grade >= 90) {
+            tdGrade.style.color = '#4caf50'; // Green for A
+        } else if (grade.grade >= 80) {
+            tdGrade.style.color = '#8bc34a'; // Light green for B
+        } else if (grade.grade >= 70) {
+            tdGrade.style.color = '#ffeb3b'; // Yellow for C
+        } else if (grade.grade >= 60) {
+            tdGrade.style.color = '#ff9800'; // Orange for D
+        } else {
+            tdGrade.style.color = '#f44336'; // Red for F
+        }
+        tr.appendChild(tdGrade);
+        
+        // Date column
+        const tdDate = document.createElement('td');
+        tdDate.textContent = new Date(grade.date).toLocaleDateString();
+        tr.appendChild(tdDate);
+        
+        // Actions column
+        const tdActions = document.createElement('td');
+        tdActions.classList.add('table-actions');
+        
+        const editBtn = document.createElement('button');
+        editBtn.innerHTML = '✏️';
+        editBtn.classList.add('edit-btn');
+        editBtn.title = 'Edit Grade';
+        editBtn.addEventListener('click', () => openModal('gradeModal', grade));
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.classList.add('delete-btn');
+        deleteBtn.title = 'Delete Grade';
+        deleteBtn.addEventListener('click', () => confirmDeleteGrade(grade));
+        
+        tdActions.appendChild(editBtn);
+        tdActions.appendChild(deleteBtn);
+        tr.appendChild(tdActions);
+        
+        tableBody.appendChild(tr);
+    });
+}
+
+// Filter grades based on student and course
+function filterGrades() {
     const studentFilter = document.getElementById('gradeFilterStudent').value;
     const courseFilter = document.getElementById('gradeFilterCourse').value;
     
-    let filteredGrades = grades;
+    let filteredGrades = [...gradesData];
     
     if (studentFilter) {
         filteredGrades = filteredGrades.filter(grade => grade.student === studentFilter);
@@ -797,357 +257,1476 @@ function loadGradesTable() {
         filteredGrades = filteredGrades.filter(grade => grade.course === courseFilter);
     }
     
-    filteredGrades.forEach(grade => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${grade.student}</td>
-            <td>${grade.course}</td>
-            <td>${grade.assignment}</td>
-            <td>${grade.grade}</td>
-            <td>${formatDate(grade.date)}</td>
-            <td class="table-actions">
-                <button class="edit-btn" data-id="${grade.id}">✏️</button>
-                <button class="delete-btn" data-id="${grade.id}">🗑️</button>
-            </td>
-        `;
-        tableBody.appendChild(tr);
-    });
-    
-    document.querySelectorAll('#gradesTable .edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const gradeId = parseInt(btn.getAttribute('data-id'));
-            openGradeModal(gradeId);
-        });
-    });
-    
-    document.querySelectorAll('#gradesTable .delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const gradeId = parseInt(btn.getAttribute('data-id'));
-            deleteGrade(gradeId);
-        });
-    });
-    
-    const studentSelect = document.getElementById('gradeFilterStudent');
-    if (studentSelect.options.length <= 1) { 
-        const uniqueStudents = [...new Set(students.map(student => student.name))];
-        
-        uniqueStudents.forEach(studentName => {
-            const option = document.createElement('option');
-            option.value = studentName;
-            option.textContent = studentName;
-            studentSelect.appendChild(option);
-        });
-    }
-    
-    document.getElementById('gradeFilterStudent').addEventListener('change', loadGradesTable);
-    document.getElementById('gradeFilterCourse').addEventListener('change', loadGradesTable);
+    renderGradesTable(filteredGrades);
 }
 
-function openGradeModal(gradeId = null) {
-    const modal = document.getElementById('gradeModal');
-    const modalTitle = document.getElementById('gradeModalTitle');
-    const form = document.getElementById('gradeForm');
-    const gradeIdInput = document.getElementById('gradeId');
-    const studentSelect = document.getElementById('gradeStudent');
-    const courseSelect = document.getElementById('gradeCourse');
-    const assignmentInput = document.getElementById('gradeAssignment');
-    const gradeInput = document.getElementById('gradeValue');
-    const dateInput = document.getElementById('gradeDate');
-    const commentsInput = document.getElementById('gradeComments');
-    
-    studentSelect.innerHTML = '';
-    students.forEach(student => {
-        const option = document.createElement('option');
-        option.value = student.name;
-        option.textContent = student.name;
-        studentSelect.appendChild(option);
-    });
-
-    courseSelect.innerHTML = '';
-    courses.forEach(course => {
-        const option = document.createElement('option');
-        option.value = course.name;
-        option.textContent = course.name;
-        courseSelect.appendChild(option);
-    });
-    
-    if (gradeId) {
-        modalTitle.textContent = 'Edit Grade';
-        const grade = grades.find(g => g.id === gradeId);
-        
-        gradeIdInput.value = grade.id;
-        studentSelect.value = grade.student;
-        courseSelect.value = grade.course;
-        assignmentInput.value = grade.assignment;
-        gradeInput.value = grade.grade;
-        dateInput.value = grade.date;
-        commentsInput.value = grade.comments || '';
-    } else {
-        modalTitle.textContent = 'Add New Grade';
-        form.reset();
-        gradeIdInput.value = '';
-        dateInput.valueAsDate = new Date();
+// Confirm and delete a grade
+function confirmDeleteGrade(grade) {
+    if (confirm(`Are you sure you want to delete grade for ${grade.student} on ${grade.assignment}?`)) {
+        deleteGrade(grade._id);
     }
-    
-    modal.style.display = 'flex';
-    
-    document.querySelector('#gradeModal .close-modal').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    document.getElementById('cancelGradeBtn').addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    form.onsubmit = function(e) {
-        e.preventDefault();
+}
+
+// Delete a grade from the API
+async function deleteGrade(gradeId) {
+    try {
+        const response = await fetch(`${API_URL}/grades/${gradeId}`, {
+            method: 'DELETE'
+        });
         
-        const gradeData = {
-            student: studentSelect.value,
-            course: courseSelect.value,
-            assignment: assignmentInput.value,
-            grade: parseInt(gradeInput.value),
-            date: dateInput.value,
-            comments: commentsInput.value
-        };
-        
-        if (gradeId) {
-            updateGrade(gradeId, gradeData);
-        } else {
-            addGrade(gradeData);
+        if (!response.ok) {
+            throw new Error('Failed to delete grade');
         }
         
-        modal.style.display = 'none';
-    };
-}
-
-function addGrade(gradeData) {
-    const newId = grades.length ? Math.max(...grades.map(g => g.id)) + 1 : 1;
-    
-    const newGrade = {
-        id: newId,
-        ...gradeData
-    };
-    
-    grades.push(newGrade);
-    
-    loadGradesTable();
-    updateDashboardStats();
-    initCharts();
-    
-    addActivity('New grade added', `${gradeData.student} received ${gradeData.grade}% on ${gradeData.assignment}`);
-    
-    showNotification('Grade added successfully!');
-}
-
-function updateGrade(id, gradeData) {
-    const index = grades.findIndex(g => g.id === id);
-    
-    grades[index] = {
-        ...grades[index],
-        ...gradeData
-    };
-    
-    loadGradesTable();
-    updateDashboardStats();
-    initCharts(); 
-    
-    addActivity('Grade updated', `${gradeData.student}'s grade for ${gradeData.assignment} was updated`);
-    
-    showNotification('Grade updated successfully!');
-}
-
-function deleteGrade(id) {
-    if (confirm('Are you sure you want to delete this grade?')) {
-        const grade = grades.find(g => g.id === id);
-        
-        grades = grades.filter(grade => grade.id !== id);
-        
-        loadGradesTable();
-        updateDashboardStats();
-        initCharts(); 
-        
-        addActivity('Grade deleted', `Grade for ${grade.student} on ${grade.assignment} was deleted`);
-        
-        showNotification('Grade deleted successfully!');
+        showNotification('Grade deleted successfully!', 'success');
+        loadGradesData();
+        // Also reload dashboard to update stats
+        if (currentPage === 'dashboard') {
+            loadDashboardData();
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
     }
 }
 
-function initAttendance() {
-    loadAttendanceTable();
+// Populate the grade form with data for editing
+function populateGradeForm(grade) {
+    document.getElementById('gradeId').value = grade._id;
     
-    document.getElementById('attendanceDate').addEventListener('change', loadAttendanceTable);
-    document.getElementById('attendanceFilterCourse').addEventListener('change', loadAttendanceTable);
+    // Populate students and courses dropdowns
+    populateStudentsDropdown('gradeStudent', grade.student);
+    populateCoursesDropdown('gradeCourse', grade.course);
+    
+    document.getElementById('gradeAssignment').value = grade.assignment;
+    document.getElementById('gradeValue').value = grade.grade;
+    
+    // Format date input properly (YYYY-MM-DD)
+    const gradeDate = new Date(grade.date);
+    document.getElementById('gradeDate').value = gradeDate.toISOString().split('T')[0];
+    
+    document.getElementById('gradeComments').value = grade.comments || '';
 }
 
-function loadAttendanceTable() {
+// Load and display Attendance data
+async function loadAttendanceData() {
+    try {
+        // Get selected date
+        const selectedDate = document.getElementById('attendanceDate').value;
+        
+        // Fetch attendance for selected date
+        await fetchAttendance(selectedDate);
+        
+        // Populate courses dropdown for filter
+        populateCoursesDropdown('attendanceFilterCourse');
+        
+        // Render attendance table
+        renderAttendanceTable(attendanceData);
+    } catch (error) {
+        showNotification('Failed to load attendance data: ' + error.message, 'error');
+    }
+}
+
+// Fetch attendance from the API
+async function fetchAttendance(date) {
+    try {
+        const response = await fetch(`${API_URL}/attendance?date=${date}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch attendance');
+        }
+        attendanceData = await response.json();
+        
+        // If no attendance records exist for this date, create from students
+        if (attendanceData.length === 0) {
+            // Fetch students if not already loaded
+            if (studentsData.length === 0) {
+                await fetchStudents();
+            }
+            
+            // Create attendance records for active students
+            attendanceData = studentsData
+                .filter(student => student.status === 'active')
+                .map(student => ({
+                    student: student.name,
+                    course: student.course,
+                    status: 'absent',
+                    checkInTime: '',
+                    date: date
+                }));
+        }
+        
+        return attendanceData;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Render attendance table
+function renderAttendanceTable(attendance) {
     const tableBody = document.querySelector('#attendanceTable tbody');
     tableBody.innerHTML = '';
     
-    const dateFilter = document.getElementById('attendanceDate').value;
+    if (attendance.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 5;
+        td.textContent = 'No attendance records found';
+        td.style.textAlign = 'center';
+        tr.appendChild(td);
+        tableBody.appendChild(tr);
+        return;
+    }
+    
+    attendance.forEach(record => {
+        const tr = document.createElement('tr');
+        
+        // Student column
+        const tdStudent = document.createElement('td');
+        tdStudent.textContent = record.student;
+        tr.appendChild(tdStudent);
+        
+        // Course column
+        const tdCourse = document.createElement('td');
+        tdCourse.textContent = record.course;
+        tr.appendChild(tdCourse);
+        
+        // Status column
+        const tdStatus = document.createElement('td');
+        const statusSelect = document.createElement('select');
+        statusSelect.classList.add('attendance-status');
+        
+        // Status options
+        const statusOptions = ['present', 'absent', 'late'];
+        statusOptions.forEach(status => {
+            const option = document.createElement('option');
+            option.value = status;
+            option.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            if (record.status === status) {
+                option.selected = true;
+            }
+            statusSelect.appendChild(option);
+        });
+        
+        statusSelect.addEventListener('change', (e) => {
+            record.status = e.target.value;
+            
+            // Update check-in time for present/late
+            if (record.status === 'present') {
+                record.checkInTime = '09:00';
+                tr.querySelector('input[type="time"]').value = '09:00';
+                tr.querySelector('input[type="time"]').disabled = false;
+            } else if (record.status === 'late') {
+                const currentTime = new Date();
+                const timeString = `${currentTime.getHours().toString().padStart(2, '0')}:${currentTime.getMinutes().toString().padStart(2, '0')}`;
+                record.checkInTime = timeString;
+                tr.querySelector('input[type="time"]').value = timeString;
+                tr.querySelector('input[type="time"]').disabled = false;
+            } else {
+                record.checkInTime = '';
+                tr.querySelector('input[type="time"]').value = '';
+                tr.querySelector('input[type="time"]').disabled = true;
+            }
+        });
+        
+        tdStatus.appendChild(statusSelect);
+        tr.appendChild(tdStatus);
+        
+        // Check-in Time column
+        const tdCheckInTime = document.createElement('td');
+        const timeInput = document.createElement('input');
+        timeInput.type = 'time';
+        timeInput.value = record.checkInTime || '';
+        timeInput.disabled = record.status === 'absent';
+        
+        timeInput.addEventListener('change', (e) => {
+            record.checkInTime = e.target.value;
+        });
+        
+        tdCheckInTime.appendChild(timeInput);
+        tr.appendChild(tdCheckInTime);
+        
+        // Actions column
+        const tdActions = document.createElement('td');
+        
+        // Toggle present/absent button
+        const toggleBtn = document.createElement('button');
+        toggleBtn.innerHTML = record.status === 'present' ? '❌' : '✅';
+        toggleBtn.title = record.status === 'present' ? 'Mark Absent' : 'Mark Present';
+        toggleBtn.classList.add('toggle-attendance-btn');
+        
+        toggleBtn.addEventListener('click', () => {
+            if (record.status === 'present') {
+                record.status = 'absent';
+                record.checkInTime = '';
+                toggleBtn.innerHTML = '✅';
+                toggleBtn.title = 'Mark Present';
+                statusSelect.value = 'absent';
+                timeInput.value = '';
+                timeInput.disabled = true;
+            } else {
+                record.status = 'present';
+                const currentTime = new Date();
+                const timeString = `${currentTime.getHours().toString().padStart(2, '0')}:${currentTime.getMinutes().toString().padStart(2, '0')}`;
+                record.checkInTime = timeString;
+                toggleBtn.innerHTML = '❌';
+                toggleBtn.title = 'Mark Absent';
+                statusSelect.value = 'present';
+                timeInput.value = timeString;
+                timeInput.disabled = false;
+            }
+        });
+        
+        tdActions.appendChild(toggleBtn);
+        tr.appendChild(tdActions);
+        
+        tableBody.appendChild(tr);
+    });
+}
+
+// Filter attendance based on course
+function filterAttendance() {
     const courseFilter = document.getElementById('attendanceFilterCourse').value;
     
-    let filteredAttendance = attendance;
-    
-    if (dateFilter) {
-        filteredAttendance = filteredAttendance.filter(record => record.date === dateFilter);
-    }
+    let filteredAttendance = [...attendanceData];
     
     if (courseFilter) {
         filteredAttendance = filteredAttendance.filter(record => record.course === courseFilter);
     }
     
-    if (filteredAttendance.length === 0 && dateFilter) {
-        let activeStudents = students.filter(student => student.status === 'active');
-        
-        if (courseFilter) {
-            activeStudents = activeStudents.filter(student => student.course === courseFilter);
-        }
-        
-        activeStudents.forEach(student => {
-            const newRecord = {
-                id: attendance.length ? Math.max(...attendance.map(a => a.id)) + 1 : 1,
-                student: student.name,
-                course: student.course,
-                status: 'absent',
-                checkInTime: '',
-                date: dateFilter
-            };
-            
-            attendance.push(newRecord);
-            filteredAttendance.push(newRecord);
-        });
-    }
-    
-    filteredAttendance.forEach(record => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${record.student}</td>
-            <td>${record.course}</td>
-            <td>
-                <select class="attendance-status" data-id="${record.id}">
-                    <option value="present" ${record.status === 'present' ? 'selected' : ''}>Present</option>
-                    <option value="late" ${record.status === 'late' ? 'selected' : ''}>Late</option>
-                    <option value="absent" ${record.status === 'absent' ? 'selected' : ''}>Absent</option>
-                </select>
-            </td>
-            <td>
-                <input type="time" class="check-in-time" data-id="${record.id}" value="${record.checkInTime}" ${record.status === 'absent' ? 'disabled' : ''}>
-            </td>
-            <td class="table-actions">
-                <button class="delete-btn" data-id="${record.id}">🗑️</button>
-            </td>
-        `;
-        tableBody.appendChild(tr);
-    });
-    
-    document.querySelectorAll('.attendance-status').forEach(select => {
-        select.addEventListener('change', function() {
-            const recordId = parseInt(this.getAttribute('data-id'));
-            const record = attendance.find(a => a.id === recordId);
-            record.status = this.value;
-            
-            const timeInput = document.querySelector(`.check-in-time[data-id="${recordId}"]`);
-            if (this.value === 'absent') {
-                timeInput.disabled = true;
-                timeInput.value = '';
-                record.checkInTime = '';
-            } else {
-                timeInput.disabled = false;
-                if (!timeInput.value && this.value === 'present') {
-                    const now = new Date();
-                    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                    timeInput.value = time;
-                    record.checkInTime = time;
-                }
-            }
-        });
-    });
-    
-    document.querySelectorAll('.check-in-time').forEach(input => {
-        input.addEventListener('change', function() {
-            const recordId = parseInt(this.getAttribute('data-id'));
-            const record = attendance.find(a => a.id === recordId);
-            record.checkInTime = this.value;
-        });
-    });
-    
-    document.querySelectorAll('#attendanceTable .delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const recordId = parseInt(btn.getAttribute('data-id'));
-            deleteAttendanceRecord(recordId);
-        });
-    });
+    renderAttendanceTable(filteredAttendance);
 }
 
-function navigateAttendanceDate(e) {
+// Change attendance date
+function changeAttendanceDate(days) {
     const dateInput = document.getElementById('attendanceDate');
     const currentDate = new Date(dateInput.value);
+    currentDate.setDate(currentDate.getDate() + days);
     
-    if (e.target.id === 'prevDateBtn') {
-        currentDate.setDate(currentDate.getDate() - 1);
-    } else {
-        currentDate.setDate(currentDate.getDate() + 1);
-    }
-    
+    // Format date as YYYY-MM-DD
     const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.getDate()).padStart(2, '0');
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    
     dateInput.value = `${year}-${month}-${day}`;
     
-    loadAttendanceTable();
+    // Load attendance data for new date
+    loadAttendanceData();
 }
 
+// Mark all students present
 function markAllPresent() {
-    const dateFilter = document.getElementById('attendanceDate').value;
-    const courseFilter = document.getElementById('attendanceFilterCourse').value;
+    const tableRows = document.querySelectorAll('#attendanceTable tbody tr');
     
-    if (!dateFilter) {
-        showNotification('Please select a date first');
+    tableRows.forEach(row => {
+        const statusSelect = row.querySelector('.attendance-status');
+        const timeInput = row.querySelector('input[type="time"]');
+        const toggleBtn = row.querySelector('.toggle-attendance-btn');
+        
+        if (statusSelect) {
+            statusSelect.value = 'present';
+            
+            // Update the data object
+            const studentName = row.cells[0].textContent;
+            const record = attendanceData.find(r => r.student === studentName);
+            
+            if (record) {
+                record.status = 'present';
+                const currentTime = new Date();
+                const timeString = `${currentTime.getHours().toString().padStart(2, '0')}:${currentTime.getMinutes().toString().padStart(2, '0')}`;
+                record.checkInTime = timeString;
+                
+                // Update UI
+                if (timeInput) {
+                    timeInput.value = timeString;
+                    timeInput.disabled = false;
+                }
+                
+                if (toggleBtn) {
+                    toggleBtn.innerHTML = '❌';
+                    toggleBtn.title = 'Mark Absent';
+                }
+            }
+        }
+    });
+    
+    showNotification('All students marked present!', 'success');
+}
+
+// Save attendance records
+async function saveAttendance() {
+    try {
+        // Create a deep copy of attendance data to send to API
+        const attendanceToSave = JSON.parse(JSON.stringify(attendanceData));
+        
+        // Ensure date is in correct format
+        attendanceToSave.forEach(record => {
+            if (typeof record.date === 'string') {
+                record.date = record.date;
+            }
+        });
+        
+        const response = await fetch(`${API_URL}/attendance`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(attendanceToSave)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to save attendance data');
+        }
+        
+        showNotification('Attendance saved successfully!', 'success');
+        
+        // Reload attendance data to get server-generated IDs
+        loadAttendanceData();
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+// Helper Functions
+
+// Populate the students dropdown
+function populateStudentsDropdown(dropdownId, selectedValue = '') {
+    const dropdown = document.getElementById(dropdownId);
+    dropdown.innerHTML = '';
+    
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = dropdownId.includes('Filter') ? 'All Students' : 'Select Student';
+    dropdown.appendChild(defaultOption);
+    
+    // Check if students data is loaded
+    if (studentsData.length === 0) {
+        fetchStudents().then(() => {
+            populateStudentsDropdown(dropdownId, selectedValue);
+        });
         return;
     }
     
-    const now = new Date();
-    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    // Add student options
+    studentsData.forEach(student => {
+        const option = document.createElement('option');
+        option.value = student.name;
+        option.textContent = student.name;
+        
+        if (student.name === selectedValue) {
+            option.selected = true;
+        }
+        
+        dropdown.appendChild(option);
+    });
+}
+
+// Populate the courses dropdown
+function populateCoursesDropdown(dropdownId, selectedValue = '') {
+    const dropdown = document.getElementById(dropdownId);
+    dropdown.innerHTML = '';
     
-    attendance.forEach(record => {
-        if (record.date === dateFilter && (!courseFilter || record.course === courseFilter)) {
-            record.status = 'present';
-            record.checkInTime = time;
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = dropdownId.includes('Filter') ? 'All Courses' : 'Select Course';
+    dropdown.appendChild(defaultOption);
+    
+    // Check if courses data is loaded
+    if (coursesData.length === 0) {
+        fetchCourses().then(() => {
+            populateCoursesDropdown(dropdownId, selectedValue);
+        });
+        return;
+    }
+    
+    // Add course options
+    coursesData.forEach(course => {
+        const option = document.createElement('option');
+        option.value = course.name;
+        option.textContent = course.name;
+        
+        if (course.name === selectedValue) {
+            option.selected = true;
+        }
+        
+        dropdown.appendChild(option);
+    });
+}
+
+// Fetch activities from the API
+async function fetchActivities() {
+    try {
+        const response = await fetch(`${API_URL}/activities`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch activities');
+        }
+        activitiesData = await response.json();
+        return activitiesData;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    const notification = document.getElementById('notification');
+    const notificationMessage = document.getElementById('notificationMessage');
+    
+    // Set message and type
+    notificationMessage.textContent = message;
+    
+    // Set color based on type
+    switch (type) {
+        case 'success':
+            notification.style.backgroundColor = 'var(--success-color)';
+            break;
+        case 'error':
+            notification.style.backgroundColor = 'var(--danger-color)';
+            break;
+        case 'warning':
+            notification.style.backgroundColor = 'var(--warning-color)';
+            notification.style.color = '#333';
+            break;
+        default:
+            notification.style.backgroundColor = 'var(--primary-color)';
+    }
+    
+    // Show notification
+    notification.style.display = 'flex';
+    
+    // Set timeout to hide notification
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+    
+    // Close notification on click
+    const closeNotification = document.querySelector('.close-notification');
+    closeNotification.addEventListener('click', () => {
+        notification.style.display = 'none';
+    });
+}
+
+// Initialize sample data
+async function initializeData() {
+    try {
+        if (confirm('This will reset all data with sample data. Are you sure?')) {
+            const response = await fetch(`${API_URL}/initialize`, {
+                method: 'POST'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to initialize data');
+            }
+            
+            showNotification('Sample data initialized successfully!', 'success');
+            
+            // Reload dashboard data
+            loadDashboardData();
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+// Set up navigation between pages
+function setupNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.getAttribute('data-page');
+            
+            // Update active class
+            navItems.forEach(navItem => navItem.classList.remove('active'));
+            item.classList.add('active');
+            
+            // Hide all pages
+            document.querySelectorAll('.page-container').forEach(container => {
+                container.classList.add('hidden');
+            });
+            
+            // Show selected page
+            document.getElementById(page).classList.remove('hidden');
+            
+            // Set current page
+            currentPage = page;
+            
+            // Load page specific data
+            loadPageData(page);
+        });
+    });
+}
+
+// Load page specific data
+function loadPageData(page) {
+    switch (page) {
+        case 'dashboard':
+            loadDashboardData();
+            break;
+        case 'students':
+            loadStudentsData();
+            break;
+        case 'courses':
+            loadCoursesData();
+            break;
+        case 'grades':
+            loadGradesData();
+            break;
+        case 'attendance':
+            loadAttendanceData();
+            break;
+    }
+}
+
+// Setup theme toggle
+function setupThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-theme');
+        isDarkTheme = document.body.classList.contains('dark-theme');
+        localStorage.setItem('darkTheme', isDarkTheme);
+        
+        // Update any charts if they exist
+        updateChartsTheme();
+    });
+}
+
+// Setup search functionality
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    searchBtn.addEventListener('click', () => performSearch(searchInput.value));
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            performSearch(searchInput.value);
+        }
+    });
+}
+
+// Perform search based on current page
+function performSearch(query) {
+    if (!query.trim()) return;
+    
+    const searchQuery = query.toLowerCase();
+    
+    switch (currentPage) {
+        case 'students':
+            const filteredStudents = studentsData.filter(student => 
+                student.name.toLowerCase().includes(searchQuery) || 
+                student.email.toLowerCase().includes(searchQuery)
+            );
+            renderStudentsTable(filteredStudents);
+            break;
+        case 'courses':
+            const filteredCourses = coursesData.filter(course => 
+                course.name.toLowerCase().includes(searchQuery) || 
+                course.code.toLowerCase().includes(searchQuery) ||
+                course.instructor.toLowerCase().includes(searchQuery)
+            );
+            renderCoursesGrid(filteredCourses);
+            break;
+        case 'grades':
+            const filteredGrades = gradesData.filter(grade => 
+                grade.student.toLowerCase().includes(searchQuery) || 
+                grade.course.toLowerCase().includes(searchQuery) ||
+                grade.assignment.toLowerCase().includes(searchQuery)
+            );
+            renderGradesTable(filteredGrades);
+            break;
+        default:
+            showNotification('Search is not available on this page.', 'warning');
+    }
+}
+
+// Setup modal events
+function setupModals() {
+    // Get all modals
+    const modals = document.querySelectorAll('.modal');
+    
+    // Get all close buttons
+    const closeButtons = document.querySelectorAll('.close-modal');
+    
+    // Get all cancel buttons
+    const cancelButtons = document.querySelectorAll('button[id$="CancelBtn"]');
+    
+    // Close modal when clicking close button
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            closeModal(modal.id);
+        });
+    });
+    
+    // Close modal when clicking cancel button
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            closeModal(modal.id);
+        });
+    });
+    
+    // Close modal when clicking outside the modal content
+    modals.forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
+}
+
+// Open a modal
+function openModal(modalId, data = null) {
+    const modal = document.getElementById(modalId);
+    
+    // Reset form
+    const form = modal.querySelector('form');
+    form.reset();
+    
+    // Set modal title and populate with data if editing
+    if (data) {
+        switch (modalId) {
+            case 'studentModal':
+                document.getElementById('studentModalTitle').textContent = 'Edit Student';
+                populateStudentForm(data);
+                break;
+            case 'courseModal':
+                document.getElementById('courseModalTitle').textContent = 'Edit Course';
+                populateCourseForm(data);
+                break;
+            case 'gradeModal':
+                document.getElementById('gradeModalTitle').textContent = 'Edit Grade';
+                populateGradeForm(data);
+                break;
+        }
+    } else {
+        // Reset titles for new entries
+        switch (modalId) {
+            case 'studentModal':
+                document.getElementById('studentModalTitle').textContent = 'Add New Student';
+                populateCoursesDropdown('studentCourse');
+                break;
+            case 'courseModal':
+                document.getElementById('courseModalTitle').textContent = 'Add New Course';
+                break;
+            case 'gradeModal':
+                document.getElementById('gradeModalTitle').textContent = 'Add New Grade';
+                populateStudentsDropdown('gradeStudent');
+                populateCoursesDropdown('gradeCourse');
+                break;
+        }
+    }
+    
+    // Show the modal
+    modal.style.display = 'flex';
+}
+
+// Close a modal
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.style.display = 'none';
+}
+
+// Setup form handlers
+function setupFormHandlers() {
+    // Student form submission
+    document.getElementById('studentForm').addEventListener('submit', handleStudentFormSubmit);
+    
+    // Course form submission
+    document.getElementById('courseForm').addEventListener('submit', handleCourseFormSubmit);
+    
+    // Grade form submission
+    document.getElementById('gradeForm').addEventListener('submit', handleGradeFormSubmit);
+    
+    // Filter handlers
+    document.getElementById('studentFilterCourse').addEventListener('change', filterStudents);
+    document.getElementById('studentFilterStatus').addEventListener('change', filterStudents);
+    document.getElementById('courseFilterCategory').addEventListener('change', filterCourses);
+    document.getElementById('courseFilterStatus').addEventListener('change', filterCourses);
+    document.getElementById('gradeFilterStudent').addEventListener('change', filterGrades);
+    document.getElementById('gradeFilterCourse').addEventListener('change', filterGrades);
+    document.getElementById('attendanceFilterCourse').addEventListener('change', filterAttendance);
+}
+
+// Form submission handlers
+async function handleStudentFormSubmit(e) {
+    e.preventDefault();
+    
+    // Get form data
+    const studentId = document.getElementById('studentId').value;
+    const studentData = {
+        name: document.getElementById('studentName').value,
+        email: document.getElementById('studentEmail').value,
+        phone: document.getElementById('studentPhone').value,
+        course: document.getElementById('studentCourse').value,
+        status: document.getElementById('studentStatus').value,
+        notes: document.getElementById('studentNotes').value
+    };
+    
+    try {
+        let response;
+        
+        if (studentId) {
+            // Update existing student
+            response = await fetch(`${API_URL}/students/${studentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(studentData)
+            });
+            
+            if (response.ok) {
+                showNotification('Student updated successfully!', 'success');
+            }
+        } else {
+            // Create new student
+            response = await fetch(`${API_URL}/students`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(studentData)
+            });
+            
+            if (response.ok) {
+                showNotification('Student added successfully!', 'success');
+            }
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to save student data');
+        }
+        
+        // Close the modal and reload students data
+        closeModal('studentModal');
+        loadStudentsData();
+        // Also reload dashboard to update stats
+        if (currentPage === 'dashboard') {
+            loadDashboardData();
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+async function handleCourseFormSubmit(e) {
+    e.preventDefault();
+    
+    // Get form data
+    const courseId = document.getElementById('courseId').value;
+    const courseData = {
+        name: document.getElementById('courseName').value,
+        code: document.getElementById('courseCode').value,
+        category: document.getElementById('courseCategory').value,
+        instructor: document.getElementById('courseInstructor').value,
+        startDate: document.getElementById('courseStartDate').value,
+        endDate: document.getElementById('courseEndDate').value,
+        status: document.getElementById('courseStatus').value,
+        description: document.getElementById('courseDescription').value
+    };
+    
+    try {
+        let response;
+        
+        if (courseId) {
+            // Update existing course
+            response = await fetch(`${API_URL}/courses/${courseId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(courseData)
+            });
+            
+            if (response.ok) {
+                showNotification('Course updated successfully!', 'success');
+            }
+        } else {
+            // Create new course
+            response = await fetch(`${API_URL}/courses`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(courseData)
+            });
+            
+            if (response.ok) {
+                showNotification('Course added successfully!', 'success');
+            }
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to save course data');
+        }
+        
+        // Close the modal and reload courses data
+        closeModal('courseModal');
+        loadCoursesData();
+        // Also reload dashboard to update stats
+        if (currentPage === 'dashboard') {
+            loadDashboardData();
+        }
+        
+        // Refresh dropdowns that contain courses
+        populateCoursesDropdown('studentCourse');
+        populateCoursesDropdown('gradeCourse');
+        populateCoursesDropdown('studentFilterCourse');
+        populateCoursesDropdown('gradeFilterCourse');
+        populateCoursesDropdown('attendanceFilterCourse');
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+async function handleGradeFormSubmit(e) {
+    e.preventDefault();
+    
+    // Get form data
+    const gradeId = document.getElementById('gradeId').value;
+    const gradeData = {
+        student: document.getElementById('gradeStudent').value,
+        course: document.getElementById('gradeCourse').value,
+        assignment: document.getElementById('gradeAssignment').value,
+        grade: document.getElementById('gradeValue').value,
+        date: document.getElementById('gradeDate').value,
+        comments: document.getElementById('gradeComments').value
+    };
+    
+    try {
+        let response;
+        
+        if (gradeId) {
+            // Update existing grade
+            response = await fetch(`${API_URL}/grades/${gradeId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gradeData)
+            });
+            
+            if (response.ok) {
+                showNotification('Grade updated successfully!', 'success');
+            }
+        } else {
+            // Create new grade
+            response = await fetch(`${API_URL}/grades`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gradeData)
+            });
+            
+            if (response.ok) {
+                showNotification('Grade added successfully!', 'success');
+            }
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to save grade data');
+        }
+        
+        // Close the modal and reload grades data
+        closeModal('gradeModal');
+        loadGradesData();
+        // Also reload dashboard to update stats
+        if (currentPage === 'dashboard') {
+            loadDashboardData();
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+// Load and display Dashboard data
+async function loadDashboardData() {
+    try {
+        // Check connection to MongoDB
+        updateConnectionStatus(true);
+        
+        // Fetch data for dashboard stats
+        await Promise.all([
+            fetchStudents(),
+            fetchCourses(),
+            fetchGrades(),
+            fetchActivities()
+        ]);
+        
+        // Update dashboard stats
+        updateDashboardStats();
+        
+        // Create charts
+        createGradesChart();
+        createAttendanceChart();
+        
+        // Render activity list
+        renderActivityList();
+    } catch (error) {
+        updateConnectionStatus(false);
+        showNotification('Failed to load dashboard data: ' + error.message, 'error');
+    }
+}
+
+// Update connection status indicator
+function updateConnectionStatus(isConnected) {
+    const statusElement = document.getElementById('connectionStatus');
+    if (isConnected) {
+        statusElement.textContent = 'Connected to MongoDB';
+        statusElement.className = 'connected';
+    } else {
+        statusElement.textContent = 'Disconnected from MongoDB';
+        statusElement.className = 'disconnected';
+    }
+}
+
+// Update dashboard statistics
+function updateDashboardStats() {
+    document.getElementById('totalStudents').textContent = studentsData.length;
+    
+    const activeCourses = coursesData.filter(course => course.status === 'active');
+    document.getElementById('totalCourses').textContent = activeCourses.length;
+    
+    // Calculate average grade
+    let totalGrade = 0;
+    gradesData.forEach(grade => {
+        totalGrade += grade.grade;
+    });
+    const avgGrade = gradesData.length > 0 ? Math.round(totalGrade / gradesData.length) : 0;
+    document.getElementById('avgGrade').textContent = avgGrade;
+    
+    // Mock attendance rate (this would normally be calculated from attendance data)
+    document.getElementById('attendanceRate').textContent = '88%';
+}
+
+// Create grade distribution chart
+function createGradesChart() {
+    const ctx = document.getElementById('gradesChart').getContext('2d');
+    
+    // Categorize grades
+    const gradeRanges = {
+        'A (90-100)': 0,
+        'B (80-89)': 0,
+        'C (70-79)': 0,
+        'D (60-69)': 0,
+        'F (0-59)': 0
+    };
+    
+    gradesData.forEach(grade => {
+        const value = grade.grade;
+        if (value >= 90) {
+            gradeRanges['A (90-100)']++;
+        } else if (value >= 80) {
+            gradeRanges['B (80-89)']++;
+        } else if (value >= 70) {
+            gradeRanges['C (70-79)']++;
+        } else if (value >= 60) {
+            gradeRanges['D (60-69)']++;
+        } else {
+            gradeRanges['F (0-59)']++;
         }
     });
     
-    loadAttendanceTable();
+    // Configure chart
+    const chartConfig = {
+        type: 'bar',
+        data: {
+            labels: Object.keys(gradeRanges),
+            datasets: [{
+                label: 'Number of Grades',
+                data: Object.values(gradeRanges),
+                backgroundColor: [
+                    '#4caf50', // Green for A
+                    '#8bc34a', // Light green for B
+                    '#ffeb3b', // Yellow for C
+                    '#ff9800', // Orange for D
+                    '#f44336'  // Red for F
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Grade Distribution',
+                    color: isDarkTheme ? '#e0e0e0' : '#333'
+                },
+                legend: {
+                    display: false
+                }
+            }
+        }
+    };
     
-    showNotification('All students marked present');
-}
-
-function saveAttendance() {
-    updateDashboardStats();
+    // If a chart already exists, destroy it safely
+    try {
+        if (window.gradesChart) {
+            window.gradesChart.destroy();
+        }
+    } catch (error) {
+        console.log("Error destroying grades chart:", error);
+    }
     
-    const dateFilter = document.getElementById('attendanceDate').value;
-    const courseFilter = document.getElementById('attendanceFilterCourse').value;
-    
-    const activityDetails = courseFilter ? 
-        `Attendance for ${courseFilter} on ${formatDate(dateFilter)}` : 
-        `Attendance for all courses on ${formatDate(dateFilter)}`;
-    
-    addActivity('Attendance saved', activityDetails);
-
-    showNotification('Attendance saved successfully!');
-}
-
-function deleteAttendanceRecord(id) {
-    if (confirm('Are you sure you want to delete this attendance record?')) {
-        const record = attendance.find(a => a.id === id);
-        
-        attendance = attendance.filter(a => a.id !== id);
-        
-        loadAttendanceTable();
-        updateDashboardStats();
-        
-        addActivity('Attendance record deleted', `Attendance record for ${record.student} on ${formatDate(record.date)} was deleted`);
-        
-        showNotification('Attendance record deleted successfully!');
+    // Create new chart
+    try {
+        window.gradesChart = new Chart(ctx, chartConfig);
+    } catch (error) {
+        console.log("Error creating grades chart:", error);
+        // Create a placeholder text to show when chart fails
+        ctx.canvas.style.height = '200px';
+        ctx.font = '14px Arial';
+        ctx.fillStyle = isDarkTheme ? '#e0e0e0' : '#333';
+        ctx.textAlign = 'center';
+        ctx.fillText('Chart could not be displayed', ctx.canvas.width / 2, ctx.canvas.height / 2);
     }
 }
+
+// Create attendance trends chart
+function createAttendanceChart() {
+    const ctx = document.getElementById('attendanceChart').getContext('2d');
+    
+    // Mock attendance data for the past 7 days
+    const dates = [];
+    const presentData = [];
+    const absentData = [];
+    const lateData = [];
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        // Generate random attendance data for demonstration
+        const total = studentsData.length || 5;  // Default to 5 if no students
+        const present = Math.floor(Math.random() * (total - 2)) + (total - 5 > 0 ? total - 5 : 1);
+        const late = Math.floor(Math.random() * 2) + 1;
+        const absent = total - present - late;
+        
+        presentData.push(present);
+        absentData.push(absent);
+        lateData.push(late);
+    }
+    
+    // Configure chart
+    const chartConfig = {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Present',
+                    data: presentData,
+                    borderColor: '#4caf50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Late',
+                    data: lateData,
+                    borderColor: '#ff9800',
+                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Absent',
+                    data: absentData,
+                    borderColor: '#f44336',
+                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Attendance Trends',
+                    color: isDarkTheme ? '#e0e0e0' : '#333'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    stacked: true
+                }
+            }
+        }
+    };
+    
+    // If a chart already exists, destroy it safely
+    try {
+        if (window.attendanceChart) {
+            window.attendanceChart.destroy();
+        }
+    } catch (error) {
+        console.log("Error destroying attendance chart:", error);
+    }
+    
+    // Create new chart
+    try {
+        window.attendanceChart = new Chart(ctx, chartConfig);
+    } catch (error) {
+        console.log("Error creating attendance chart:", error);
+        // Create a placeholder text to show when chart fails
+        ctx.canvas.style.height = '200px';
+        ctx.font = '14px Arial';
+        ctx.fillStyle = isDarkTheme ? '#e0e0e0' : '#333';
+        ctx.textAlign = 'center';
+        ctx.fillText('Chart could not be displayed', ctx.canvas.width / 2, ctx.canvas.height / 2);
+    }
+}
+
+// Update charts theme based on dark/light mode
+function updateChartsTheme() {
+    const textColor = isDarkTheme ? '#e0e0e0' : '#333';
+    
+    try {
+        if (window.gradesChart && window.gradesChart.options) {
+            window.gradesChart.options.plugins.title.color = textColor;
+            if (window.gradesChart.options.scales.x && window.gradesChart.options.scales.x.ticks) {
+                window.gradesChart.options.scales.x.ticks.color = textColor;
+            }
+            if (window.gradesChart.options.scales.y && window.gradesChart.options.scales.y.ticks) {
+                window.gradesChart.options.scales.y.ticks.color = textColor;
+            }
+            window.gradesChart.update();
+        }
+    } catch (error) {
+        console.log("Error updating grades chart theme:", error);
+    }
+    
+    try {
+        if (window.attendanceChart && window.attendanceChart.options) {
+            window.attendanceChart.options.plugins.title.color = textColor;
+            if (window.attendanceChart.options.scales.x && window.attendanceChart.options.scales.x.ticks) {
+                window.attendanceChart.options.scales.x.ticks.color = textColor;
+            }
+            if (window.attendanceChart.options.scales.y && window.attendanceChart.options.scales.y.ticks) {
+                window.attendanceChart.options.scales.y.ticks.color = textColor;
+            }
+            window.attendanceChart.update();
+        }
+    } catch (error) {
+        console.log("Error updating attendance chart theme:", error);
+    }
+}
+
+// Render the activity list
+function renderActivityList() {
+    const activityList = document.getElementById('activityList');
+    activityList.innerHTML = '';
+    
+    activitiesData.slice(0, 5).forEach(activity => {
+        const li = document.createElement('li');
+        
+        const actionSpan = document.createElement('span');
+        actionSpan.textContent = `${activity.action}: ${activity.details}`;
+        
+        const timeSpan = document.createElement('span');
+        timeSpan.textContent = activity.time;
+        timeSpan.classList.add('activity-time');
+        
+        li.appendChild(actionSpan);
+        li.appendChild(timeSpan);
+        
+        activityList.appendChild(li);
+    });
+}
+
+// Load and display Students data
+async function loadStudentsData() {
+    try {
+        await fetchStudents();
+        
+        // Populate course filter dropdown
+        populateCoursesDropdown('studentFilterCourse');
+        
+        // Render students table
+        renderStudentsTable(studentsData);
+    } catch (error) {
+        showNotification('Failed to load students data: ' + error.message, 'error');
+    }
+}
+
+// Fetch students from the API
+async function fetchStudents() {
+    try {
+        const response = await fetch(`${API_URL}/students`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch students');
+        }
+        studentsData = await response.json();
+        return studentsData;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Render students table
+function renderStudentsTable(students) {
+    const tableBody = document.querySelector('#studentsTable tbody');
+    tableBody.innerHTML = '';
+    
+    if (students.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 6;
+        td.textContent = 'No students found';
+        td.style.textAlign = 'center';
+        tr.appendChild(td);
+        tableBody.appendChild(tr);
+        return;
+    }
+    
+    students.forEach(student => {
+        const tr = document.createElement('tr');
+        
+        // Student ID column
+        const tdId = document.createElement('td');
+        tdId.textContent = student._id;
+        tr.appendChild(tdId);
+        
+        // Name column
+        const tdName = document.createElement('td');
+        tdName.textContent = student.name;
+        tr.appendChild(tdName);
+        
+        // Email column
+        const tdEmail = document.createElement('td');
+        tdEmail.textContent = student.email;
+        tr.appendChild(tdEmail);
+        
+        // Course column
+        const tdCourse = document.createElement('td');
+        tdCourse.textContent = student.course;
+        tr.appendChild(tdCourse);
+        
+        // Status column
+        const tdStatus = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        statusBadge.textContent = student.status.charAt(0).toUpperCase() + student.status.slice(1);
+        statusBadge.classList.add('status-badge', `status-${student.status}`);
+        tdStatus.appendChild(statusBadge);
+        tr.appendChild(tdStatus);
+        
+        // Actions column
+        const tdActions = document.createElement('td');
+        tdActions.classList.add('table-actions');
+        
+        const editBtn = document.createElement('button');
+        editBtn.innerHTML = '✏️';
+        editBtn.classList.add('edit-btn');
+        editBtn.title = 'Edit Student';
+        editBtn.addEventListener('click', () => openModal('studentModal', student));
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.classList.add('delete-btn');
+        deleteBtn.title = 'Delete Student';
+        deleteBtn.addEventListener('click', () => confirmDeleteStudent(student));
+        
+        tdActions.appendChild(editBtn);
+        tdActions.appendChild(deleteBtn);
+        tr.appendChild(tdActions);
+        
+        tableBody.appendChild(tr);
+    });
+}
+
+// Confirm and delete a student
+function confirmDeleteStudent(student) {
+    if (confirm(`Are you sure you want to delete ${student.name}?`)) {
+        deleteStudent(student._id);
+    }
+}
+
+// Delete a student from the API
+async function deleteStudent(studentId) {
+    try {
+        const response = await fetch(`${API_URL}/students/${studentId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete student');
+        }
+        
+        showNotification('Student deleted successfully!', 'success');
+        loadStudentsData();
+        // Also reload dashboard to update stats
+        if (currentPage === 'dashboard') {
+            loadDashboardData();
+        }
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+// Filter students based on course and status
+function filterStudents() {
+    const courseFilter = document.getElementById('studentFilterCourse').value;
+    const statusFilter = document.getElementById('studentFilterStatus').value;
+    
+    let filteredStudents = [...studentsData];
+    
+    if (courseFilter) {
+        filteredStudents = filteredStudents.filter(student => student.course === courseFilter);
+    }
+    
+    if (statusFilter) {
+        filteredStudents = filteredStudents.filter(student => student.status === statusFilter);
+    }
+    
+    renderStudentsTable(filteredStudents);
+}
+
+// Populate the student form with data for editing
+function populateStudentForm(student) {
+    document.getElementById('studentId').value = student._id;
+    document.getElementById('studentName').value = student.name;
+    document.getElementById('studentEmail').value = student.email;
+    document.getElementById('studentPhone').value = student.phone || '';
+    
+    // Populate course dropdown
+    populateCoursesDropdown('studentCourse', student.course);
+    
+    document.getElementById('studentStatus').value = student.status;
+    document.getElementById('studentNotes').value = student.notes || '';
+}
+
+// Load and display Courses data
+async function loadCoursesData() {
+    try {
+        await fetchCourses();
+        
+        // Render courses grid
+        renderCoursesGrid(coursesData);
+    } catch (error) {
+        showNotification('Failed to load courses data: ' + error.message, 'error');
+    }
+}
+
+// Fetch courses from the API
+async function fetchCourses() {
+    try {
+        const response = await fetch(`${API_URL}/courses`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch courses');
+        }
+        coursesData = await response.json();
+        return coursesData;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Render courses grid
+function renderCoursesGrid(courses) {
+    const courseGrid = document.getElementById('courseGrid');
+    courseGrid.innerHTML = '';
+    
+    if (courses.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.textContent = 'No courses found';
+        emptyMessage.style.textAlign = 'center';
+        emptyMessage.style.padding = '20px';
+        courseGrid.appendChild(emptyMessage);
+        return;
+    }
+    
+    courses.forEach(course => {
+        const courseCard = document.createElement('div');
+        courseCard.classList.add('course-card');
+        
+        const courseHeader = document.createElement('div');
+        courseHeader.classList.add('course-header');
+        
+        const courseTitle = document.createElement('h3');
+        courseTitle.classList.add('course-title');
+        courseTitle.textContent = course.name;
+        
+        const courseCode = document.createElement('div');
+        courseCode.classList.add('course-code');
+        courseCode.textContent = course.code;
+        
+        courseHeader.appendChild(courseTitle);
+        courseHeader.appendChild(courseCode);
+        
+        const courseBody = document.createElement('div');
+        courseBody.classList.add('course-body');
+        
+        // Instructor
+        const courseInstructor = document.createElement('div');
+        courseInstructor.classList.add('course-instructor');
+        courseInstructor.innerHTML = `<span class="icon">👨‍🏫</span> <span>${course.instructor}</span>`;
+        
+        // Dates
+        const courseDates = document.createElement('div');
+        courseDates.classList.add('course-dates');
+        const startDate = new Date(course.startDate).toLocaleDateString();
+        const endDate = new Date(course.endDate).toLocaleDateString();
+        courseDates.innerHTML = `<span class="icon">📅</span> <span>${startDate} - ${endDate}</span>`;
+        
+        // Status
+        const courseStatus = document.createElement('div');
+        courseStatus.classList.add('course-status');
+        courseStatus.innerHTML = `<span class="icon">⚡</span> <span>${course.category.charAt(0).toUpperCase() + course.category.slice(1)}</span>`;
+        
+        courseBody.appendChild(courseInstructor);
+        courseBody.appendChild(courseDates);
+        courseBody.appendChild(courseStatus);
+        
+        const courseFooter = document.createElement('div');
+        courseFooter.classList.add('course-footer');
+        
+        const statusBadge = document.createElement('span');
+        statusBadge.classList.add('status-badge', `status-${course.status}`);
+        statusBadge.textContent = course.status.charAt(0).toUpperCase() + course.status.slice(1);
+        
+        const courseActions = document.createElement('div');
+        courseActions.classList.add('table-actions');
+        
+        const editBtn = document.createElement('button');
+        editBtn.innerHTML = '✏️';
+        editBtn.classList.add('edit-btn');
+        editBtn.title = 'Edit Course';
+        editBtn.addEventListener('click', () => openModal('courseModal', course));
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '🗑️';
+        deleteBtn.classList.add('delete-btn');
+        deleteBtn.title = 'Delete Course';
+        deleteBtn.addEventListener('click', () => confirmDeleteCourse(course));
+        
+        courseActions.appendChild(editBtn);
+        courseActions.appendChild(deleteBtn);
+        
+        courseFooter.appendChild(statusBadge);
+        courseFooter.appendChild(courseActions);
+        
+        courseCard.appendChild(courseHeader);
+        courseCard.appendChild(courseBody);
+        courseCard.appendChild(courseFooter);
+        
+        courseGrid.appendChild(courseCard);
+    })
+};

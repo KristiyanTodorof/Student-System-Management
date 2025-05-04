@@ -1,6 +1,6 @@
 /* Base Variables and Reset */
 :root {
-    --primary-color: #4a6cfa;
+    --primary-color: #4DB33D; /* MongoDB green */
     --secondary-color: #f0f2f5;
     --text-color: #333;
     --text-light: #767676;
@@ -17,7 +17,7 @@
 
 /* Dark Theme Variables */
 .dark-theme {
-    --primary-color: #4a6cfa;
+    --primary-color: #5AD24C; /* Lighter MongoDB green for dark theme */
     --secondary-color: #2a2a2a;
     --text-color: #e0e0e0;
     --text-light: #b0b0b0;
@@ -192,6 +192,31 @@ body {
 
 .hidden {
     display: none;
+}
+
+/* Connection Status */
+.connection-status {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.connection-status span {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.connection-status .connected {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.connection-status .disconnected {
+    background-color: var(--danger-color);
+    color: white;
 }
 
 /* Dashboard Styles */

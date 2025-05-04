@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Management System</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo">
-                <h2>Virtual School</h2>
+                <h2>StudentMS</h2>
             </div>
             <nav class="nav-menu">
                 <ul>
@@ -38,7 +39,7 @@
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <p>Course Project</p>
+                <p>MongoDB Course Project</p>
                 <p>© 2025</p>
             </div>
         </aside>
@@ -54,7 +55,7 @@
                     <button id="themeToggle">🌓</button>
                     <div class="user-profile">
                         <span>Admin</span>
-                        <img src="admin.png" alt="User Avatar">
+                        <img src="https://via.placeholder.com/32" alt="User Avatar">
                     </div>
                 </div>
             </header>
@@ -62,6 +63,11 @@
             <!-- Dashboard Page -->
             <div class="page-container" id="dashboard">
                 <h1>Dashboard</h1>
+                
+                <div class="connection-status">
+                    <span id="connectionStatus" class="connected">Connected to MongoDB</span>
+                </div>
+                
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <h3>Total Students</h3>
@@ -84,11 +90,24 @@
                         <div class="stat-icon">📅</div>
                     </div>
                 </div>
+                <div class="chart-container">
+                    <div class="chart-card">
+                        <h3>Grade Distribution</h3>
+                        <canvas id="gradesChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Attendance Trends</h3>
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
                 <div class="recent-activity">
                     <h3>Recent Activity</h3>
                     <ul id="activityList">
                         <!-- Will be populated with JavaScript -->
                     </ul>
+                </div>
+                <div class="action-bar" style="margin-top: 20px;">
+                    <button id="initFirebaseBtn" class="btn btn-primary">Initialize MongoDB Data</button>
                 </div>
             </div>
 
@@ -384,7 +403,7 @@
         <span class="close-notification">&times;</span>
     </div>
 
-    <!-- JavaScript -->
+    <!-- Main JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
